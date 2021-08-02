@@ -63,7 +63,8 @@ const otherConcernsFormOptions = {
     formMessage: '[data-role="oc-message"]',
     submittingMessage: 'Submitting your concern...',
     submittingMessageSuccess: 'Your message has been successfully sent. ',
-    submittingMessageSuccessWithUser: 'You may check its status in the Account Page. '
+    submittingMessageSuccessWithUser: 'You may check its status in the Account Page. ',
+    concernsSeparator: ','
 }
 
 const cssClassOptions = {
@@ -92,6 +93,7 @@ class UserFunctions {
         firstName: '',
         lastName: '',
         contactNo: '',
+        sentConcerns: '',
     };
 
     constructor() {
@@ -404,9 +406,11 @@ class UserFunctions {
                 UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertSuccess, otherConcernsFormOptions.submittingMessageSuccess);
 
                 if (userId !== UserFunctions.emptyString) {
-                    // Create into a function
+                    let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
+                    console.log(`Sent Concerns : ${sentConcerns}`);
+
                     database.ref(`${firebaseConfig.db_users}/${userId}`).update({
-                        sentConcerns: newConcern.key,
+                        sentConcerns: sentConcerns + otherConcernsFormOptions.concernsSeparator +newConcern.key,
                     }, function (error) {
                         if (!error) {
                             UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertSuccess, otherConcernsFormOptions.submittingMessageSuccess + otherConcernsFormOptions.submittingMessageSuccessWithUser);
@@ -416,6 +420,7 @@ class UserFunctions {
                         }
                     });
                 }
+
                 return true;
             }
         });
