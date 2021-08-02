@@ -109,7 +109,7 @@ class UserFunctions {
                 UserFunctions.userSnapshot = snapshot.val();
                 UserFunctions.userSnapshot.userId = userId;
                 UserFunctions.loadLoggedInUserElements();
-                UserFunctions.loadUserConcerns();
+                UserFunctions.newUserConcernListener();
                 UserFunctions.setLoading(false);
             }).catch(function () {
                 UserFunctions.deleteCookie(UserFunctions.loggedInCookieName);
@@ -408,11 +408,21 @@ class UserFunctions {
 
                 if (userId !== UserFunctions.emptyString) {
                     let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
+                    let preConcernString = '';
+
+                    if (sentConcerns === undefined) {
+                        preConcernString = UserFunctions.emptyString;
+                    } else {
+                        preConcernString = sentConcerns + otherConcernsFormOptions.concernsSeparator;
+                    }
+
+                    console.log(`PRE: ${preConcernString}`);
 
                     database.ref(`${firebaseConfig.db_users}/${userId}`).update({
-                        sentConcerns: sentConcerns + otherConcernsFormOptions.concernsSeparator +newConcern.key,
+                        sentConcerns: preConcernString + newConcern.key,
                     }, function (error) {
                         if (!error) {
+                            UserFunctions.userSnapshot.sentConcerns = preConcernString + newConcern.key;
                             UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertSuccess, otherConcernsFormOptions.submittingMessageSuccess + otherConcernsFormOptions.submittingMessageSuccessWithUser);
                             return false;
                         } else {
@@ -436,6 +446,13 @@ class UserFunctions {
         let userConcerns = firebase.database().ref(`${firebaseConfig.db_users}/${userId}`);
 
         userConcerns.on('child_changed', (data) => {
+            if (data.key === firebaseConfig.db_users_concerns) {
+                // TODO: Add new element for new concern
+                console.log(`New data updated for ${data.key} : ${data.val()}`);
+            }
+        });
+
+        userConcerns.on('child_added', (data) => {
             if (data.key === firebaseConfig.db_users_concerns) {
                 // TODO: Add new element for new concern
                 console.log(`New data added for ${data.key} : ${data.val()}`);
