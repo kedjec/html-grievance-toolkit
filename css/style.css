@@ -324,7 +324,7 @@ body .btn-secondary:hover {
     align-items: center;
     display: flex;
     height: auto;
-    min-height: 700px;
+    min-height: 80vh;
     padding-bottom: 10em;
     padding-top: 10em;
 }
@@ -448,7 +448,7 @@ body .btn-secondary:hover {
     align-items: center;
     background-color: var(--second-bg-color);
     display: flex;
-    min-height: 15vh;
+    min-height: 20vh;
     padding: 3em 0;
 }
 
