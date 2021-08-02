@@ -109,6 +109,7 @@ class UserFunctions {
                 UserFunctions.userSnapshot = snapshot.val();
                 UserFunctions.userSnapshot.userId = userId;
                 UserFunctions.loadLoggedInUserElements();
+                UserFunctions.loadUserConcerns();
                 UserFunctions.setLoading(false);
             }).catch(function () {
                 UserFunctions.deleteCookie(UserFunctions.loggedInCookieName);
@@ -407,7 +408,6 @@ class UserFunctions {
 
                 if (userId !== UserFunctions.emptyString) {
                     let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
-                    console.log(`Sent Concerns : ${sentConcerns}`);
 
                     database.ref(`${firebaseConfig.db_users}/${userId}`).update({
                         sentConcerns: sentConcerns + otherConcernsFormOptions.concernsSeparator +newConcern.key,
@@ -422,6 +422,23 @@ class UserFunctions {
                 }
 
                 return true;
+            }
+        });
+    }
+
+    static newUserConcernListener() {
+        let userId = UserFunctions.getUserSnapshot().userId;
+
+        if (userId === UserFunctions.emptyString) {
+            return false;
+        }
+
+        let userConcerns = firebase.database().ref(`${firebaseConfig.db_users}/${userId}`);
+
+        userConcerns.on('child_changed', (data) => {
+            if (data.key === firebaseConfig.db_users_concerns) {
+                // TODO: Add new element for new concern
+                console.log(`New data added for ${data.key} : ${data.val()}`);
             }
         });
     }
