@@ -13,7 +13,7 @@
 
 <section class="welcome-banner container-fluid left" id="welcome">
     <div class="welcome-text-wrapper">
-        <h2 class="welcome-title" data-role="logged-in-user-message-name">
+        <h2 class="welcome-title" data-logged-in-role="logged-in-user-message-name">
             Welcome!
         </h2>
         <p class="welcome-sentence">
@@ -188,19 +188,38 @@
         <div class="main-section container">
             <div class="content-wrapper logged-in-wrapper" data-logged-in="show">
                 <div class="logged-in-user-header">
-                    <h2 class="welcome-message loading-bar" data-role="logged-in-user-message-name">
+                    <h2 class="welcome-message loading-bar" data-logged-in-role="logged-in-user-message-name">
                         Welcome, User!
                     </h2>
 
                     <div class="current-user-box">
                         <div class="logged-in-user-text loading-bar">
                             Logged in as
-                            <strong data-role="logged-in-user-message-email">User</strong>
+                            <strong data-logged-in-role="logged-in-user-message-email">User</strong>
                         </div>
                         <span class="logout" data-role="logged-in-user-logout">Logout</span>
                     </div>
                 </div>
-                <div class="loading-bar" id="other-concerns-items">
+                <div class="card-feature">
+                    <h5 class="font-weight-bold mb-3 d-block">Sent Concerns</h5>
+                    <div class="overflow-auto table-wrapper">
+                        <table class="loading-bar" id="other-concerns-items-wrapper" data-role="other-concerns-table">
+                            <thead data-has-concerns-role="true">
+                            <tr>
+                                <th class="col-concern-key">Concern No.</th>
+                                <th class="col-concern-title">Concern Title</th>
+                                <th class="col-concern-message">Message</th>
+                                <th class="col-concern-status">Status</th>
+                            </tr>
+                            </thead>
+
+                            <tbody data-has-concerns-role="true" data-role="concern-item-holder"></tbody>
+                        </table>
+
+                        <div class="alert alert-warning rounded" role="alert" data-has-concerns-role="false">
+                            No Data Found
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="content-wrapper" data-logged-in="hide">
@@ -409,7 +428,6 @@
 </div>
 
 <!--
-TODO: Add submit function for other concerns form
 TODO: Add dynamic loading of grievances
 TODO: Add admin CRUD of grievances
 TODO: Add new list section of deans and colleges etc.
@@ -427,7 +445,7 @@ TODO: Complete Footer Links
             <form action=""
                   autocomplete="off"
                   class="needs-validation site-forms"
-                  data-role="signup-form"
+                  data-role="other-concerns-form"
                   id="other-concerns-form"
                   method="post"
                   novalidate
@@ -439,7 +457,12 @@ TODO: Complete Footer Links
                     </button>
                 </div>
                 <div class="modal-body">
-                    <input data-role="logged-in-user-id"
+                    <div class="alert alert-info d-none" data-role="message-box" role="alert">
+                        <span data-role="message">Submitting your concern...</span>
+                    </div>
+
+                    <input data-logged-in-role="logged-in-user-id"
+                           data-role="oc-user-id"
                            id="oc-user-id"
                            name="oc-user-id"
                            type="hidden"/>
@@ -449,7 +472,8 @@ TODO: Complete Footer Links
                             <div class="form-group">
                                 <label class="col-form-label" for="oc-first-name">First Name</label>
                                 <input class="form-control"
-                                       data-role="logged-in-user-first-name"
+                                       data-logged-in-role="logged-in-user-first-name"
+                                       data-role="oc-first-name"
                                        id="oc-first-name"
                                        name="oc-first-name"
                                        placeholder="First Name"
@@ -469,7 +493,8 @@ TODO: Complete Footer Links
                                 <div class="form-group">
                                     <label class="col-form-label" for="oc-last-name">Last Name</label>
                                     <input class="form-control"
-                                           data-role="logged-in-user-last-name"
+                                           data-logged-in-role="logged-in-user-last-name"
+                                           data-role="oc-last-name"
                                            id="oc-last-name"
                                            name="oc-last-name"
                                            placeholder="Last Name"
@@ -491,7 +516,8 @@ TODO: Complete Footer Links
                             <div class="form-group">
                                 <label class="col-form-label" for="oc-email">Email</label>
                                 <input class="form-control"
-                                       data-role="logged-in-user-message-email"
+                                       data-logged-in-role="logged-in-user-email"
+                                       data-role="oc-email"
                                        id="oc-email"
                                        name="oc-email"
                                        placeholder="Email"
@@ -510,7 +536,8 @@ TODO: Complete Footer Links
                             <div class="form-group">
                                 <label class="col-form-label" for="oc-contact">Contact Number</label>
                                 <input class="form-control"
-                                       data-role="logged-in-user-contact-number"
+                                       data-logged-in-role="logged-in-user-contact-number"
+                                       data-role="oc-contact"
                                        id="oc-contact"
                                        maxlength="11"
                                        name="oc-contact"
@@ -531,7 +558,8 @@ TODO: Complete Footer Links
                             <div class="form-group">
                                 <label class="col-form-label" for="oc-silliman-id-no">Silliman ID No.</label>
                                 <input class="form-control"
-                                       data-role="logged-in-user-silliman-id-no"
+                                       data-logged-in-role="logged-in-user-silliman-id-no"
+                                       data-role="oc-silliman-id-no"
                                        id="oc-silliman-id-no"
                                        maxlength="10"
                                        minlength="10"
@@ -552,7 +580,7 @@ TODO: Complete Footer Links
                         <div class="form-group">
                             <label class="col-form-label" for="oc-message-subject">Concern</label>
                             <input class="form-control"
-                                   data-role="logged-in-user-concern-title"
+                                   data-role="oc-message-subject"
                                    id="oc-message-subject"
                                    name="oc-message-subject"
                                    placeholder="ec: Dormitory, Class, Grades"
@@ -569,12 +597,13 @@ TODO: Complete Footer Links
                     <div class="form-group">
                         <label class="col-form-label" for="oc-message">Message</label>
                         <textarea class="form-control"
+                                  data-role="oc-message"
                                   id="oc-message"
                                   maxlength="300"
                                   name="oc-message"
                                   placeholder="Tell us how we can help"
-                                  rows="4"
-                                  required></textarea>
+                                  required
+                                  rows="4"></textarea>
                         <div class="valid-feedback">
                             Looks good!
                         </div>

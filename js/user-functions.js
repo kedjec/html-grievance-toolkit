@@ -24,13 +24,14 @@ const loginOptions = {
     loggedInHiddenElementData: '[data-logged-in="hide"]',
     loggedInShowElementData: '[data-logged-in="show"]',
     loggedInUserLogoutButtonRole: '[data-role="logged-in-user-logout"]',
-    loggedInUserWelcomeMessageName: '[data-role="logged-in-user-message-name"]',
-    loggedInUserWelcomeMessageEmail: '[data-role="logged-in-user-message-email"]',
-    loggedInUserContactNumberRole: '[data-role="logged-in-user-contact-number"]',
-    loggedInUserFirstNameRole: '[data-role="logged-in-user-first-name"]',
-    loggedInUserLastNameRole: '[data-role="logged-in-user-last-name"]',
-    loggedInUserUserIdRole: '[data-role="logged-in-user-id"]',
-    loggedInUserSillimanIdRole: '[data-role="logged-in-user-silliman-id-no"]',
+    loggedInUserWelcomeMessageName: '[data-logged-in-role="logged-in-user-message-name"]',
+    loggedInUserWelcomeMessageEmail: '[data-logged-in-role="logged-in-user-message-email"]',
+    loggedInUserFirstNameRole: '[data-logged-in-role="logged-in-user-first-name"]',
+    loggedInUserLastNameRole: '[data-logged-in-role="logged-in-user-last-name"]',
+    loggedInUserUserIdRole: '[data-logged-in-role="logged-in-user-id"]',
+    loggedInUserSillimanIdRole: '[data-logged-in-role="logged-in-user-silliman-id-no"]',
+    loggedInUserEmailRole: '[data-logged-in-role="logged-in-user-email"]',
+    loggedInUserContactRole: '[data-logged-in-role="logged-in-user-contact-number"]',
     loggedInUserWelcomeMessagePreText: 'Welcome',
     tryAgainLink: `${window.location.origin}${window.location.pathname}#account`,
     emptyFormMessage: 'Please fill up the form. ',
@@ -51,8 +52,28 @@ const formOptions = {
 
 const otherConcernsFormOptions = {
     formModalId: '#other-concerns-form-holder',
-    formDataRole: '[data-role="other-concerns-form-holder"]',
-    buttonDataRole: '[data-role="other-concerns-form-button"]',
+    formDataRole: '[data-role="other-concerns-form"]',
+    formUserId: '[data-role="oc-user-id"]',
+    formFirstName: '[data-role="oc-first-name"]',
+    formLastName: '[data-role="oc-last-name"]',
+    formContactNumber: '[data-role="oc-contact"]',
+    formEmail: '[data-role="oc-email"]',
+    formSillimanIdNumber: '[data-role="oc-silliman-id-no"]',
+    formConcern: '[data-role="oc-message-subject"]',
+    formMessage: '[data-role="oc-message"]',
+    submittingMessage: 'Submitting your concern...',
+    submittingMessageSuccess: 'Your message has been successfully sent. ',
+    submittingMessageSuccessWithUser: 'You may check its status in the Account Page. ',
+    concernsSeparator: ','
+}
+
+const otherConcernsTableOptions = {
+    tableRole: '[data-role="other-concerns-table"]',
+    hasConcernsRole: '[data-has-concerns-role="true"]',
+    hasNoConcernsRole: '[data-has-concerns-role="false"]',
+    concernsHolderRole: '[data-role="concern-item-holder"]',
+    concernItemClass: 'concern-item',
+    concernItemCellValueClass: 'cell-value',
 }
 
 const cssClassOptions = {
@@ -72,15 +93,23 @@ const loadingOptions = {
 class UserFunctions {
     static signupForm = document.querySelector(`.needs-validation${(signupOptions.formDataRole)}`);
     static loginForm = document.querySelector(`.needs-validation${(loginOptions.formDataRole)}`);
+    static otherConcernsForm = document.querySelector(`.needs-validation${(otherConcernsFormOptions.formDataRole)}`);
+    static otherConcernsTable = document.querySelector(`${(otherConcernsTableOptions.tableRole)}`);
     static emptyString = '';
     static deletedCookieValue = 'deleted';
     static loggedInCookieName = 'logged-in-user';
     static breakException = {};
-    static userSnapshot = {};
+    static userSnapshot = {
+        firstName: '',
+        lastName: '',
+        contactNo: '',
+        sentConcerns: '',
+    };
 
     constructor() {
         UserFunctions.initializeLogin();
         UserFunctions.initializeSignUp();
+        UserFunctions.initializeOtherConcernsForm();
 
         let userId = UserFunctions.isUserLoggedIn();
         UserFunctions.setLoading();
@@ -90,6 +119,8 @@ class UserFunctions {
                 UserFunctions.userSnapshot = snapshot.val();
                 UserFunctions.userSnapshot.userId = userId;
                 UserFunctions.loadLoggedInUserElements();
+                UserFunctions.loadOtherConcernsTable();
+                UserFunctions.newUserConcernListener();
                 UserFunctions.setLoading(false);
             }).catch(function () {
                 UserFunctions.deleteCookie(UserFunctions.loggedInCookieName);
@@ -130,13 +161,13 @@ class UserFunctions {
     static signupUser() {
         let errorMessage = UserFunctions.emptyString;
 
-        let firstName = UserFunctions.signupForm.querySelector(`input${(signupOptions.formFirstName)}`).value;
-        let lastName = UserFunctions.signupForm.querySelector(`input${(signupOptions.formLastName)}`).value;
-        let contactNo = UserFunctions.signupForm.querySelector(`input${(signupOptions.formContactNumber)}`).value;
-        let email = UserFunctions.signupForm.querySelector(`input${(signupOptions.formEmail)}`).value;
-        let sillimanId = UserFunctions.signupForm.querySelector(`input${(signupOptions.formSillimanIdNumber)}`).value;
-        let password = UserFunctions.signupForm.querySelector(`input${(signupOptions.formPassword)}`).value;
-        let confirmPassword = UserFunctions.signupForm.querySelector(`input${(signupOptions.formConfirmPassword)}`).value;
+        let firstName = UserFunctions.signupForm.querySelector(`input${(signupOptions.formFirstName)}`).value.trim();
+        let lastName = UserFunctions.signupForm.querySelector(`input${(signupOptions.formLastName)}`).value.trim();
+        let contactNo = UserFunctions.signupForm.querySelector(`input${(signupOptions.formContactNumber)}`).value.trim();
+        let email = UserFunctions.signupForm.querySelector(`input${(signupOptions.formEmail)}`).value.trim();
+        let sillimanId = UserFunctions.signupForm.querySelector(`input${(signupOptions.formSillimanIdNumber)}`).value.trim();
+        let password = UserFunctions.signupForm.querySelector(`input${(signupOptions.formPassword)}`).value.trim();
+        let confirmPassword = UserFunctions.signupForm.querySelector(`input${(signupOptions.formConfirmPassword)}`).value.trim();
 
         try {
             [firstName, lastName, contactNo, email, sillimanId, password, confirmPassword].forEach(function (value) {
@@ -193,7 +224,7 @@ class UserFunctions {
             errorMessage += loginOptions.invalidFieldsFormMessage;
         }
 
-        if ((email.value === UserFunctions.emptyString) || (password.value === UserFunctions.emptyString)) {
+        if ((email.value.trim() === UserFunctions.emptyString) || (password.value === UserFunctions.emptyString)) {
             errorMessage += loginOptions.emptyFormMessage;
         }
 
@@ -204,7 +235,7 @@ class UserFunctions {
 
         UserFunctions.displayAlert(UserFunctions.loginForm, cssClassOptions.alertInfo, loginOptions.loggingInAccountMessage);
 
-        firebase.auth().signInWithEmailAndPassword(email.value, password.value).then(function () {
+        firebase.auth().signInWithEmailAndPassword(email.value.trim(), password.value).then(function () {
             let loggedInUser = firebase.auth().currentUser;
             let loggedInUserId = loggedInUser.uid;
             // TODO: loggedInUser.emailVerified
@@ -331,6 +362,237 @@ class UserFunctions {
         }, false);
     }
 
+    static initializeOtherConcernsForm() {
+        UserFunctions.otherConcernsForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            UserFunctions.submitOtherConcerns();
+        }, false);
+    }
+
+    static submitOtherConcerns() {
+        let errorMessage = UserFunctions.emptyString;
+
+        let userId = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formUserId)}`).value;
+        let firstName = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formFirstName)}`).value.trim();
+        let lastName = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formLastName)}`).value.trim();
+        let contactNo = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formContactNumber)}`).value.trim();
+        let email = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formEmail)}`).value.trim();
+        let sillimanId = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formSillimanIdNumber)}`).value.trim();
+        let concern = UserFunctions.otherConcernsForm.querySelector(`input${(otherConcernsFormOptions.formConcern)}`).value.trim();
+        let message = UserFunctions.otherConcernsForm.querySelector(`textarea${(otherConcernsFormOptions.formMessage)}`).value.trim();
+
+        try {
+            [firstName, lastName, contactNo, email, sillimanId, concern, message].forEach(function (value) {
+                if (value === UserFunctions.emptyString) {
+                    errorMessage += signupOptions.emptyFormMessage;
+                    throw UserFunctions.breakException;
+                }
+            });
+        } catch (e) {
+            if (e !== UserFunctions.breakException) throw e;
+        }
+
+        if (errorMessage !== UserFunctions.emptyString) {
+            UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertError, errorMessage);
+            return false;
+        }
+
+        UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertInfo, otherConcernsFormOptions.submittingMessage);
+
+        let newConcern = firebase.database().ref(firebaseConfig.db_concerns).push();
+
+        newConcern.set({
+            firstName: firstName,
+            lastName: lastName,
+            contactNo: contactNo,
+            email: email,
+            idNo: sillimanId,
+            concern: concern,
+            body: message,
+            status: firebaseConfig.db_concerns_unread,
+        }, function (error) {
+            if (error) {
+                UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertError, errorMessage + ' ' + error.message);
+                return false;
+            } else {
+                UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertSuccess, otherConcernsFormOptions.submittingMessageSuccess);
+
+                if (userId !== UserFunctions.emptyString) {
+                    let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
+                    let preConcernString = '';
+
+                    if (sentConcerns === undefined) {
+                        preConcernString = UserFunctions.emptyString;
+                    } else {
+                        preConcernString = sentConcerns + otherConcernsFormOptions.concernsSeparator;
+                    }
+
+                    database.ref(`${firebaseConfig.db_users}/${userId}`).update({
+                        sentConcerns: preConcernString + newConcern.key,
+                    }, function (error) {
+                        if (!error) {
+                            UserFunctions.userSnapshot.sentConcerns = preConcernString + newConcern.key;
+                            UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertSuccess, otherConcernsFormOptions.submittingMessageSuccess + otherConcernsFormOptions.submittingMessageSuccessWithUser);
+                            return false;
+                        } else {
+                            UserFunctions.displayAlert(UserFunctions.otherConcernsForm, cssClassOptions.alertSuccess, otherConcernsFormOptions.submittingMessageSuccess + 'There was error in saving your concern to your account. ');
+                        }
+                    });
+                }
+
+                return true;
+            }
+        });
+    }
+
+    static newUserConcernListener() {
+        let userId = UserFunctions.getUserSnapshot().userId;
+        let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
+
+        if ((userId === UserFunctions.emptyString)) {
+            return false;
+        }
+
+        if ((sentConcerns === undefined)) {
+            sentConcerns = UserFunctions.emptyString;
+        }
+
+        let sentConcernsArray = sentConcerns.split(otherConcernsFormOptions.concernsSeparator);
+        let userConcerns = firebase.database().ref(`${firebaseConfig.db_users}/${userId}`);
+
+        userConcerns.on('child_changed', (data) => {
+            if (data.key === firebaseConfig.db_users_concerns) {
+                let changedArray = data.val().split(otherConcernsFormOptions.concernsSeparator);
+                let arrayDifference = UserFunctions.arrayDifference(UserFunctions.getUserSnapshot().sentConcerns, changedArray);
+                UserFunctions.addToOtherConcernTable(arrayDifference);
+                UserFunctions.userSnapshot.sentConcerns = changedArray;
+            }
+        });
+
+        userConcerns.on('child_added', (data) => {
+            if (data.key === firebaseConfig.db_users_concerns) {
+                let addedArray = data.val().split(otherConcernsFormOptions.concernsSeparator);
+                let arrayDifference = UserFunctions.arrayDifference(UserFunctions.getUserSnapshot().sentConcerns, addedArray);
+                UserFunctions.addToOtherConcernTable(arrayDifference);
+                UserFunctions.userSnapshot.sentConcerns = addedArray;
+            }
+        })
+    }
+
+    static arrayDifference(oldArray, newArray) {
+        let difference = [];
+
+        if (oldArray === undefined) {
+            oldArray = [];
+        }
+
+        newArray.forEach(function (value) {
+            if (!oldArray.includes(value)) {
+                difference.push(value);
+            }
+        });
+
+        return difference;
+    }
+
+    static loadOtherConcernsTable() {
+        let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
+        let elementsToRemove;
+
+        if ((sentConcerns === undefined) || (sentConcerns === UserFunctions.emptyString)) {
+            elementsToRemove = document.querySelectorAll(`*${otherConcernsTableOptions.hasConcernsRole}`);
+        } else {
+            elementsToRemove = document.querySelectorAll(`*${otherConcernsTableOptions.hasNoConcernsRole}`);
+            let sentConcernsArray = sentConcerns.split(otherConcernsFormOptions.concernsSeparator);
+            UserFunctions.addToOtherConcernTable(sentConcernsArray);
+        }
+
+        elementsToRemove.forEach(function (value) {
+            value.classList.add(cssClassOptions.displayNone);
+        });
+    }
+
+    static addToOtherConcernTable(sentConcernsArray) {
+        if (sentConcernsArray.length === 0) {
+            return false;
+        }
+
+        let error = false;
+
+        let elementsToRemove = document.querySelectorAll(`*${otherConcernsTableOptions.hasNoConcernsRole}`);
+        let elementsToShow = document.querySelectorAll(`*${otherConcernsTableOptions.hasConcernsRole}`);
+
+        sentConcernsArray.forEach(function (concernId) {
+            firebase.database().ref(`${firebaseConfig.db_concerns}/` + concernId).once('value').then(function (snapshot) {
+                UserFunctions.addOtherConcernItem(concernId, snapshot.val().concern, snapshot.val().body, snapshot.val().status);
+            }).catch(function () {
+                error = true;
+            });
+        });
+
+        if (error) {
+            elementsToRemove.forEach(function (value) {
+                value.classList.remove(cssClassOptions.displayNone);
+            });
+
+            elementsToShow.forEach(function (value) {
+                value.classList.add(cssClassOptions.displayNone);
+            });
+        } else {
+            elementsToRemove.forEach(function (value) {
+                value.classList.add(cssClassOptions.displayNone);
+            });
+
+            elementsToShow.forEach(function (value) {
+                value.classList.remove(cssClassOptions.displayNone);
+            });
+        }
+    }
+
+    static addOtherConcernItem(key, title, message, status) {
+        let concernsHolder = UserFunctions.otherConcernsTable.querySelector(`*${otherConcernsTableOptions.concernsHolderRole}`);
+
+        let otherConcernTableItem = document.createElement('tr');
+        let keyCell = document.createElement('td');
+        let titleCell = document.createElement('td');
+        let messageCell = document.createElement('td');
+        let statusCell = document.createElement('td');
+
+        let keyValue = document.createElement('span');
+        let titleValue = document.createElement('span');
+        let messageValue = document.createElement('span');
+        let statusValue = document.createElement('span');
+
+        otherConcernTableItem.classList.add(otherConcernsTableOptions.concernItemClass);
+
+        keyCell.classList.add('col-concern-key');
+        titleCell.classList.add('col-concern-title');
+        messageCell.classList.add('col-concern-message');
+        statusCell.classList.add('col-concern-status');
+
+        keyValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass);
+        titleValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass);
+        messageValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass);
+        statusValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass, status.toLowerCase());
+
+        keyValue.innerHTML = key;
+        titleValue.innerHTML = title;
+        messageValue.innerHTML = message;
+        statusValue.innerHTML = status;
+
+        keyCell.append(keyValue);
+        titleCell.append(titleValue);
+        messageCell.append(messageValue);
+        statusCell.append(statusValue);
+
+        otherConcernTableItem.append(keyCell);
+        otherConcernTableItem.append(titleCell);
+        otherConcernTableItem.append(messageCell);
+        otherConcernTableItem.append(statusCell);
+
+        concernsHolder.append(otherConcernTableItem);
+    }
+
     static loadLoggedInUserElements() {
         let loggedInHiddenElements;
         let userSnapshot = UserFunctions.getUserSnapshot();
@@ -344,8 +606,9 @@ class UserFunctions {
             UserFunctions.setElement(loginOptions.loggedInUserWelcomeMessageEmail, userSnapshot.email);
             UserFunctions.setElement(loginOptions.loggedInUserFirstNameRole, userSnapshot.firstName);
             UserFunctions.setElement(loginOptions.loggedInUserLastNameRole, userSnapshot.lastName);
-            UserFunctions.setElement(loginOptions.loggedInUserContactNumberRole, userSnapshot.contactNo);
+            UserFunctions.setElement(loginOptions.loggedInUserContactRole, userSnapshot.contactNo);
             UserFunctions.setElement(loginOptions.loggedInUserSillimanIdRole, userSnapshot.sillimanID);
+            UserFunctions.setElement(loginOptions.loggedInUserEmailRole, userSnapshot.email);
             UserFunctions.setElement(loginOptions.loggedInUserUserIdRole, userSnapshot.userId);
 
             UserFunctions.removeLoadingBarElements();
