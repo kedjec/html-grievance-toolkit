@@ -200,7 +200,26 @@
                         <span class="logout" data-role="logged-in-user-logout">Logout</span>
                     </div>
                 </div>
-                <div class="loading-bar" id="other-concerns-items">
+                <div class="card-feature">
+                    <h5 class="font-weight-bold mb-3 d-block">Sent Concerns</h5>
+                    <div class="overflow-auto table-wrapper">
+                        <table class="loading-bar" id="other-concerns-items-wrapper" data-role="other-concerns-table">
+                            <thead data-has-concerns-role="true">
+                            <tr>
+                                <th class="col-concern-key">Concern No.</th>
+                                <th class="col-concern-title">Concern Title</th>
+                                <th class="col-concern-message">Message</th>
+                                <th class="col-concern-status">Status</th>
+                            </tr>
+                            </thead>
+
+                            <tbody data-has-concerns-role="true" data-role="concern-item-holder"></tbody>
+                        </table>
+
+                        <div class="alert alert-warning rounded" role="alert" data-has-concerns-role="false">
+                            No Data Found
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="content-wrapper" data-logged-in="hide">
@@ -409,7 +428,6 @@
 </div>
 
 <!--
-TODO: Add submit function for other concerns form
 TODO: Add dynamic loading of grievances
 TODO: Add admin CRUD of grievances
 TODO: Add new list section of deans and colleges etc.

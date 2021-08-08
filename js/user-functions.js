@@ -67,6 +67,15 @@ const otherConcernsFormOptions = {
     concernsSeparator: ','
 }
 
+const otherConcernsTableOptions = {
+    tableRole: '[data-role="other-concerns-table"]',
+    hasConcernsRole: '[data-has-concerns-role="true"]',
+    hasNoConcernsRole: '[data-has-concerns-role="false"]',
+    concernsHolderRole: '[data-role="concern-item-holder"]',
+    concernItemClass: 'concern-item',
+    concernItemCellValueClass: 'cell-value',
+}
+
 const cssClassOptions = {
     displayNone: 'd-none',
     invisible: 'invisible',
@@ -85,6 +94,7 @@ class UserFunctions {
     static signupForm = document.querySelector(`.needs-validation${(signupOptions.formDataRole)}`);
     static loginForm = document.querySelector(`.needs-validation${(loginOptions.formDataRole)}`);
     static otherConcernsForm = document.querySelector(`.needs-validation${(otherConcernsFormOptions.formDataRole)}`);
+    static otherConcernsTable = document.querySelector(`${(otherConcernsTableOptions.tableRole)}`);
     static emptyString = '';
     static deletedCookieValue = 'deleted';
     static loggedInCookieName = 'logged-in-user';
@@ -109,6 +119,7 @@ class UserFunctions {
                 UserFunctions.userSnapshot = snapshot.val();
                 UserFunctions.userSnapshot.userId = userId;
                 UserFunctions.loadLoggedInUserElements();
+                UserFunctions.loadOtherConcernsTable();
                 UserFunctions.newUserConcernListener();
                 UserFunctions.setLoading(false);
             }).catch(function () {
@@ -416,8 +427,6 @@ class UserFunctions {
                         preConcernString = sentConcerns + otherConcernsFormOptions.concernsSeparator;
                     }
 
-                    console.log(`PRE: ${preConcernString}`);
-
                     database.ref(`${firebaseConfig.db_users}/${userId}`).update({
                         sentConcerns: preConcernString + newConcern.key,
                     }, function (error) {
@@ -438,26 +447,150 @@ class UserFunctions {
 
     static newUserConcernListener() {
         let userId = UserFunctions.getUserSnapshot().userId;
+        let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
 
-        if (userId === UserFunctions.emptyString) {
+        if ((userId === UserFunctions.emptyString)) {
             return false;
         }
 
+        if ((sentConcerns === undefined)) {
+            sentConcerns = UserFunctions.emptyString;
+        }
+
+        let sentConcernsArray = sentConcerns.split(otherConcernsFormOptions.concernsSeparator);
         let userConcerns = firebase.database().ref(`${firebaseConfig.db_users}/${userId}`);
 
         userConcerns.on('child_changed', (data) => {
             if (data.key === firebaseConfig.db_users_concerns) {
-                // TODO: Add new element for new concern
-                console.log(`New data updated for ${data.key} : ${data.val()}`);
+                let changedArray = data.val().split(otherConcernsFormOptions.concernsSeparator);
+                let arrayDifference = UserFunctions.arrayDifference(UserFunctions.getUserSnapshot().sentConcerns, changedArray);
+                UserFunctions.addToOtherConcernTable(arrayDifference);
+                UserFunctions.userSnapshot.sentConcerns = changedArray;
             }
         });
 
         userConcerns.on('child_added', (data) => {
             if (data.key === firebaseConfig.db_users_concerns) {
-                // TODO: Add new element for new concern
-                console.log(`New data added for ${data.key} : ${data.val()}`);
+                let addedArray = data.val().split(otherConcernsFormOptions.concernsSeparator);
+                let arrayDifference = UserFunctions.arrayDifference(UserFunctions.getUserSnapshot().sentConcerns, addedArray);
+                UserFunctions.addToOtherConcernTable(arrayDifference);
+                UserFunctions.userSnapshot.sentConcerns = addedArray;
+            }
+        })
+    }
+
+    static arrayDifference(oldArray, newArray) {
+        let difference = [];
+
+        if (oldArray === undefined) {
+            oldArray = [];
+        }
+
+        newArray.forEach(function (value) {
+            if (!oldArray.includes(value)) {
+                difference.push(value);
             }
         });
+
+        return difference;
+    }
+
+    static loadOtherConcernsTable() {
+        let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
+        let elementsToRemove;
+
+        if ((sentConcerns === undefined) || (sentConcerns === UserFunctions.emptyString)) {
+            elementsToRemove = document.querySelectorAll(`*${otherConcernsTableOptions.hasConcernsRole}`);
+        } else {
+            elementsToRemove = document.querySelectorAll(`*${otherConcernsTableOptions.hasNoConcernsRole}`);
+            let sentConcernsArray = sentConcerns.split(otherConcernsFormOptions.concernsSeparator);
+            UserFunctions.addToOtherConcernTable(sentConcernsArray);
+        }
+
+        elementsToRemove.forEach(function (value) {
+            value.classList.add(cssClassOptions.displayNone);
+        });
+    }
+
+    static addToOtherConcernTable(sentConcernsArray) {
+        if (sentConcernsArray.length === 0) {
+            return false;
+        }
+
+        let error = false;
+
+        let elementsToRemove = document.querySelectorAll(`*${otherConcernsTableOptions.hasNoConcernsRole}`);
+        let elementsToShow = document.querySelectorAll(`*${otherConcernsTableOptions.hasConcernsRole}`);
+
+        sentConcernsArray.forEach(function (concernId) {
+            firebase.database().ref(`${firebaseConfig.db_concerns}/` + concernId).once('value').then(function (snapshot) {
+                UserFunctions.addOtherConcernItem(concernId, snapshot.val().concern, snapshot.val().body, snapshot.val().status);
+            }).catch(function () {
+                error = true;
+            });
+        });
+
+        if (error) {
+            elementsToRemove.forEach(function (value) {
+                value.classList.remove(cssClassOptions.displayNone);
+            });
+
+            elementsToShow.forEach(function (value) {
+                value.classList.add(cssClassOptions.displayNone);
+            });
+        } else {
+            elementsToRemove.forEach(function (value) {
+                value.classList.add(cssClassOptions.displayNone);
+            });
+
+            elementsToShow.forEach(function (value) {
+                value.classList.remove(cssClassOptions.displayNone);
+            });
+        }
+    }
+
+    static addOtherConcernItem(key, title, message, status) {
+        let concernsHolder = UserFunctions.otherConcernsTable.querySelector(`*${otherConcernsTableOptions.concernsHolderRole}`);
+
+        let otherConcernTableItem = document.createElement('tr');
+        let keyCell = document.createElement('td');
+        let titleCell = document.createElement('td');
+        let messageCell = document.createElement('td');
+        let statusCell = document.createElement('td');
+
+        let keyValue = document.createElement('span');
+        let titleValue = document.createElement('span');
+        let messageValue = document.createElement('span');
+        let statusValue = document.createElement('span');
+
+        otherConcernTableItem.classList.add(otherConcernsTableOptions.concernItemClass);
+
+        keyCell.classList.add('col-concern-key');
+        titleCell.classList.add('col-concern-title');
+        messageCell.classList.add('col-concern-message');
+        statusCell.classList.add('col-concern-status');
+
+        keyValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass);
+        titleValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass);
+        messageValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass);
+        statusValue.classList.add(otherConcernsTableOptions.concernItemCellValueClass, status.toLowerCase());
+
+        keyValue.innerHTML = key;
+        titleValue.innerHTML = title;
+        messageValue.innerHTML = message;
+        statusValue.innerHTML = status;
+
+        keyCell.append(keyValue);
+        titleCell.append(titleValue);
+        messageCell.append(messageValue);
+        statusCell.append(statusValue);
+
+        otherConcernTableItem.append(keyCell);
+        otherConcernTableItem.append(titleCell);
+        otherConcernTableItem.append(messageCell);
+        otherConcernTableItem.append(statusCell);
+
+        concernsHolder.append(otherConcernTableItem);
     }
 
     static loadLoggedInUserElements() {

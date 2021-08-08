@@ -324,7 +324,7 @@ body .btn-secondary:hover {
     align-items: center;
     display: flex;
     height: auto;
-    min-height: 80vh;
+    min-height: 100vh;
     padding-bottom: 10em;
     padding-top: 10em;
 }
@@ -412,6 +412,10 @@ body .btn-secondary:hover {
 /* End of Main Section */
 
 /* Home */
+.content-sections #home .main-section {
+    min-height: 100vh;
+}
+
 #home .content-wrapper {
     width: 100%;
 }
@@ -579,9 +583,50 @@ body .btn-secondary:hover {
     row-gap: 1em;
 }
 
+#other-concerns-items-wrapper {
+    width: 100%;
+}
 
-#account #other-concerns-items {
-    min-height: 500px;
+#other-concerns-items-wrapper th,
+#other-concerns-items-wrapper td {
+    line-height: 1.3em;
+}
+
+#other-concerns-items-wrapper th {
+    border-bottom: 1px solid gainsboro;
+    padding: 0 2em 1em 0;
+}
+
+#other-concerns-items-wrapper td {
+    padding: 1em 2em 1em 0;
+}
+
+#other-concerns-items-wrapper .concern-item {
+    border-bottom: 1px solid gainsboro;
+}
+
+#other-concerns-items-wrapper .col-concern-key {
+    white-space: nowrap;
+}
+
+#other-concerns-items-wrapper .col-concern-status {
+    text-transform: capitalize;
+}
+
+#other-concerns-items-wrapper .cell-value {
+    font-size: 1em;
+}
+
+#other-concerns-items-wrapper .col-concern-status .cell-value {
+    background-color: gray;
+    border-radius: 50px;
+    color: white;
+    padding: 0.3em 0.8em;
+}
+
+#other-concerns-items-wrapper .col-concern-status .cell-value.unread {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 #account .current-user-box > * {
@@ -594,6 +639,10 @@ body .btn-secondary:hover {
 
 #account .current-user-box .logged-in-user-text > * {
     font-size: 1em;
+}
+
+#account .table-wrapper {
+    min-height: 400px;
 }
 
 .loading-bar {
@@ -661,12 +710,6 @@ body .btn-secondary:hover {
     background-color: #eeeeee;
 }
 
-/*#other-concerns-form-holder .modal-content #other-concerns-form input,*/
-/*#other-concerns-form-holder .modal-content #other-concerns-form textarea {*/
-/*    background-color: var(--darkTransparent);*/
-/*    color: white;*/
-/*}*/
-
 #other-concerns-form-holder #other-concerns-form .modal-title,
 #other-concerns-form-holder #other-concerns-form .form-group label {
     font-weight: bold;
@@ -726,13 +769,13 @@ body .btn-secondary:hover {
 }
 
 #site-loading {
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    display: flex;
-    justify-content: center;
     align-items: center;
-    top: 0;
-    z-index: 99999;
     background-color: var(--main-bg-color);
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 99999;
 }

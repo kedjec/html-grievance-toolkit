@@ -13,6 +13,7 @@ const firebaseConfig = {
     admin_user_type: "admin",
     db_concerns_read: "seen",
     db_concerns_unread: "unread",
+    db_concerns_responded: "responded",
 };
 
 firebase.initializeApp(firebaseConfig);
