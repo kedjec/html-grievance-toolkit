@@ -554,6 +554,16 @@ body .btn-secondary:hover {
     flex: 1 1 100%;
 }
 
+#footer .links .link:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+}
+
+#footer .links .link:active {
+    transform: scale(0.95);
+    transition: transform 0.2s;
+}
+
 /* End of Footer */
 
 /* Site Forms */
@@ -652,6 +662,7 @@ body .btn-secondary:hover {
 
 #other-concerns-items-wrapper td {
     padding: 1em 2em 1em 0;
+    vertical-align: text-top;
 }
 
 #other-concerns-items-wrapper .concern-item {
@@ -663,7 +674,17 @@ body .btn-secondary:hover {
 }
 
 #other-concerns-items-wrapper .col-concern-status {
+    padding: 1em;
     text-transform: capitalize;
+    width: 5%;
+}
+
+#other-concerns-items-wrapper .col-concern-key {
+    width: 10%;
+}
+
+#other-concerns-items-wrapper .col-concern-title {
+    width: 20%;
 }
 
 #other-concerns-items-wrapper .cell-value {
@@ -680,6 +701,16 @@ body .btn-secondary:hover {
 #other-concerns-items-wrapper .col-concern-status .cell-value.unread {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+#other-concerns-items-wrapper .col-concern-status .cell-value.seen {
+    background-color: #78d7e2;
+    color: #16565d;
+}
+
+#other-concerns-items-wrapper .col-concern-status .cell-value.responded {
+    background-color: #8aeaa2;
+    color: #276738;
 }
 
 #account .current-user-box > * {
