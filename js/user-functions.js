@@ -90,11 +90,21 @@ const loadingOptions = {
     stillLoadingClass: 'still-loading'
 }
 
+const grievancesOptions = {
+    dataRole: '[data-role="content-categories-holder"]',
+    boxClass: 'grievance-box',
+    mediaHolderClass: 'media-wrapper',
+    mediaAlt: 'grievance image',
+    titleHolderClass: 'title-wrapper'
+}
+
+
 class UserFunctions {
     static signupForm = document.querySelector(`.needs-validation${(signupOptions.formDataRole)}`);
     static loginForm = document.querySelector(`.needs-validation${(loginOptions.formDataRole)}`);
     static otherConcernsForm = document.querySelector(`.needs-validation${(otherConcernsFormOptions.formDataRole)}`);
-    static otherConcernsTable = document.querySelector(`${(otherConcernsTableOptions.tableRole)}`);
+    static otherConcernsTable = document.querySelector(`*${(otherConcernsTableOptions.tableRole)}`);
+    static grievancesSection = document.querySelector(`*${(grievancesOptions.dataRole)}`);
     static emptyString = '';
     static deletedCookieValue = 'deleted';
     static loggedInCookieName = 'logged-in-user';
@@ -105,6 +115,7 @@ class UserFunctions {
         contactNo: '',
         sentConcerns: '',
     };
+    static grievancesSnapshot = {};
 
     constructor() {
         UserFunctions.initializeLogin();
@@ -131,6 +142,45 @@ class UserFunctions {
             UserFunctions.loadLoggedInUserElements();
             UserFunctions.setLoading(false);
         }
+
+        UserFunctions.loadGrievances();
+    }
+
+    static loadGrievances() {
+        UserFunctions.setLoading();
+
+        firebase.database().ref(`${firebaseConfig.db_grievances}`).once('value').then(function (snapshot) {
+            UserFunctions.grievancesSnapshot = snapshot.val();
+            UserFunctions.buildGrievancesBoxes();
+            UserFunctions.setLoading(false);
+        }).catch(function () {
+            alert('Error in loading the data');
+            UserFunctions.setLoading(false);
+        });
+    }
+
+    static buildGrievancesBoxes() {
+        Object.entries(UserFunctions.grievancesSnapshot).forEach(([key, value]) => {
+            UserFunctions.createBox(UserFunctions.grievancesSection, value.name, value.icon);
+        });
+    }
+
+    static createBox(parent, title, icon) {
+        let box = document.createElement('div');
+        let boxImage = document.createElement('img');
+        let boxTitle = document.createElement('div');
+
+        box.classList.add(grievancesOptions.boxClass);
+        boxImage.classList.add(grievancesOptions.mediaHolderClass);
+        boxTitle.classList.add(grievancesOptions.titleHolderClass);
+
+        boxTitle.innerHTML = title;
+        boxImage.setAttribute('src', icon);
+        boxImage.setAttribute('alt', grievancesOptions.mediaAlt);
+
+        box.append(boxImage, boxTitle);
+
+        parent.append(box);
     }
 
     static setLoading(isLoading = true) {
@@ -447,17 +497,11 @@ class UserFunctions {
 
     static newUserConcernListener() {
         let userId = UserFunctions.getUserSnapshot().userId;
-        let sentConcerns = UserFunctions.getUserSnapshot().sentConcerns;
 
         if ((userId === UserFunctions.emptyString)) {
             return false;
         }
 
-        if ((sentConcerns === undefined)) {
-            sentConcerns = UserFunctions.emptyString;
-        }
-
-        let sentConcernsArray = sentConcerns.split(otherConcernsFormOptions.concernsSeparator);
         let userConcerns = firebase.database().ref(`${firebaseConfig.db_users}/${userId}`);
 
         userConcerns.on('child_changed', (data) => {

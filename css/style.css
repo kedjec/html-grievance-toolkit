@@ -420,6 +420,59 @@ body .btn-secondary:hover {
     width: 100%;
 }
 
+#home #content-categories {
+    column-gap: 3em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 3em;
+    row-gap: 3em;
+}
+
+#home #content-categories > .grievance-box {
+    background: var(--lightTransparent);
+    border-radius: 1em;
+    box-shadow: var(--site-shadow);
+    cursor: pointer;
+    display: grid;
+    flex: 0 1 30%;
+    flex-direction: column;
+    grid-gap: 1.2em;
+    grid-template-rows: 140px 1fr;
+    justify-content: center;
+    min-height: 200px;
+    padding: 2em;
+    text-align: center;
+    transition: 0.3s;
+    user-select: none;
+}
+
+#home #content-categories > .grievance-box:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+}
+
+#home #content-categories > .grievance-box:active {
+    transform: scale(0.95);
+    transition: transform 0.2s;
+}
+
+
+#content-categories > .grievance-box .media-wrapper {
+    display: block;
+    height: 140px;
+    margin: auto;
+    min-height: 20px;
+    width: auto;
+}
+
+#content-categories > .grievance-box .title-wrapper {
+    align-items: center;
+    display: flex;
+    font-weight: bold;
+    line-height: 1.5em;
+}
+
 /* End of Home */
 
 /* Sign Up Form */
