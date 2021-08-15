@@ -78,11 +78,14 @@ const otherConcernsTableOptions = {
 
 const cssClassOptions = {
     displayNone: 'd-none',
+    hidden: 'hidden',
     invisible: 'invisible',
     alertSuccess: 'alert-success',
     alertError: 'alert-danger',
     alertInfo: 'alert-info',
     loadingBar: 'loading-bar',
+    fadeIn: 'fade-in',
+    breadcrumbClass: 'breadcrumb-item',
 }
 
 const loadingOptions = {
@@ -92,12 +95,31 @@ const loadingOptions = {
 
 const grievancesOptions = {
     dataRole: '[data-role="content-categories-holder"]',
+    modalLoadingDataRole: '[data-role="modal-loading"]',
+    modalGrievanceChildrenDataRole: '[data-role="grievance-children-box"]',
     boxClass: 'grievance-box',
     mediaHolderClass: 'media-wrapper',
     mediaAlt: 'grievance image',
-    titleHolderClass: 'title-wrapper'
+    titleHolderClass: 'title-wrapper',
+    dataKeyModal: 'data-modal-key',
+    dataTargetModal: 'data-target',
+    dataTargetModalValue: '#grievance-modal',
+    modalChildrenData: 'data-children',
+    modalTitleData: 'data-modal-title',
+    modalImageData: 'data-modal-image',
+    grievanceTitle: '[data-role="grievance-title"]',
+    grievanceImage: '[data-role="grievance-image"]',
+    grievanceInstructions: '[data-role="grievance-instructions"]',
+    withChildrenInstructions: 'Related grievances are found and categorized below',
+    withStepsInstructions: 'A guide on how to process your grievance',
+    grievanceSteps: '[data-role="grievance-steps-box"]',
+    grievanceBreadCrumbs: '[data-role="grievance-breadcrumbs"]',
+    grievanceGeneratedBreadCrumb: 'generated-crumb',
+    modalDataRole: 'data-role',
+    grievanceBreadcrumbName: 'name',
+    grievanceBreadcrumbParent: 'parent',
+    breadcrumbObjectId: 'data-object-id',
 }
-
 
 class UserFunctions {
     static signupForm = document.querySelector(`.needs-validation${(signupOptions.formDataRole)}`);
@@ -105,6 +127,11 @@ class UserFunctions {
     static otherConcernsForm = document.querySelector(`.needs-validation${(otherConcernsFormOptions.formDataRole)}`);
     static otherConcernsTable = document.querySelector(`*${(otherConcernsTableOptions.tableRole)}`);
     static grievancesSection = document.querySelector(`*${(grievancesOptions.dataRole)}`);
+    static grievancesModalChildrenSection = document.querySelector(`*${(grievancesOptions.modalGrievanceChildrenDataRole)}`);
+    static grievancesModalTitle = document.querySelector(`*${(grievancesOptions.grievanceTitle)}`);
+    static grievancesModalImage = document.querySelector(`*${(grievancesOptions.grievanceImage)}`);
+    static grievancesModalInstruction = document.querySelector(`*${(grievancesOptions.grievanceInstructions)}`);
+    static grievancesModalBreadcrumbs = document.querySelector(`*${(grievancesOptions.grievanceBreadCrumbs)}`);
     static emptyString = '';
     static deletedCookieValue = 'deleted';
     static loggedInCookieName = 'logged-in-user';
@@ -116,6 +143,7 @@ class UserFunctions {
         sentConcerns: '',
     };
     static grievancesSnapshot = {};
+    static grievancesBreadcrumbs = [];
 
     constructor() {
         UserFunctions.initializeLogin();
@@ -146,12 +174,26 @@ class UserFunctions {
         UserFunctions.loadGrievances();
     }
 
+    static setGrievanceModalLoading(loading = true) {
+        if (loading) {
+            document.querySelector(`*${grievancesOptions.modalLoadingDataRole}`)
+                .classList
+                .remove(cssClassOptions.displayNone);
+            return true;
+        }
+
+        document.querySelector(`*${grievancesOptions.modalLoadingDataRole}`)
+            .classList
+            .add(cssClassOptions.displayNone);
+    }
+
     static loadGrievances() {
         UserFunctions.setLoading();
 
         firebase.database().ref(`${firebaseConfig.db_grievances}`).once('value').then(function (snapshot) {
             UserFunctions.grievancesSnapshot = snapshot.val();
             UserFunctions.buildGrievancesBoxes();
+            UserFunctions.setBreadcrumbsSnapshot(UserFunctions.grievancesSnapshot);
             UserFunctions.setLoading(false);
         }).catch(function () {
             alert('Error in loading the data');
@@ -159,18 +201,160 @@ class UserFunctions {
         });
     }
 
-    static buildGrievancesBoxes() {
-        Object.entries(UserFunctions.grievancesSnapshot).forEach(([key, value]) => {
-            UserFunctions.createBox(UserFunctions.grievancesSection, value.name, value.icon);
+    static removeGeneratedBreadCrumbs() {
+        document.querySelectorAll(`*[${grievancesOptions.modalDataRole}="${grievancesOptions.grievanceGeneratedBreadCrumb}"]`).forEach(function (value, key) {
+            value.remove();
         });
     }
 
-    static createBox(parent, title, icon) {
+    static setBreadcrumbsSnapshot(objectVar, parent = '') {
+        if (parent === UserFunctions.emptyString) {
+            Object.entries(objectVar).forEach(([key, value]) => {
+                UserFunctions.grievancesBreadcrumbs[key] = [];
+
+                if (value.hasOwnProperty('children')) {
+                    UserFunctions.setBreadcrumbsSnapshot(value.children, key);
+                } else {
+                    UserFunctions.grievancesBreadcrumbs[key] = [];
+                }
+
+                UserFunctions.grievancesBreadcrumbs[key][grievancesOptions.grievanceBreadcrumbName] = value.name;
+            });
+        } else {
+            Object.entries(objectVar).forEach(([key, value]) => {
+                UserFunctions.grievancesBreadcrumbs[key] = [];
+
+                if (value.hasOwnProperty('children')) {
+                    UserFunctions.setBreadcrumbsSnapshot(value.children, key);
+                } else {
+                    UserFunctions.grievancesBreadcrumbs[key] = [];
+                }
+
+                UserFunctions.grievancesBreadcrumbs[key][grievancesOptions.grievanceBreadcrumbName] = value.name;
+                UserFunctions.grievancesBreadcrumbs[key][grievancesOptions.grievanceBreadcrumbParent] = parent;
+            });
+        }
+    }
+
+    static buildBreadCrumbs(grievanceId) {
+        UserFunctions.removeGeneratedBreadCrumbs();
+
+        if (UserFunctions.grievancesBreadcrumbs[grievanceId] === undefined) {
+            return false;
+        }
+
+        if (UserFunctions.grievancesBreadcrumbs[grievanceId][grievancesOptions.grievanceBreadcrumbParent] !== undefined) {
+            UserFunctions.buildBreadCrumbs(UserFunctions.grievancesBreadcrumbs[grievanceId][grievancesOptions.grievanceBreadcrumbParent]);
+        }
+
+        UserFunctions.createBreadCrumb(
+            UserFunctions.grievancesBreadcrumbs[grievanceId][grievancesOptions.grievanceBreadcrumbName],
+            grievanceId
+        );
+    }
+
+    static createBreadCrumb(name, id = '') {
+        let breadcrumbItem = document.createElement('span');
+
+        breadcrumbItem.classList.add(cssClassOptions.breadcrumbClass);
+        breadcrumbItem.setAttribute(grievancesOptions.modalDataRole, grievancesOptions.grievanceGeneratedBreadCrumb);
+        breadcrumbItem.setAttribute(grievancesOptions.breadcrumbObjectId, id);
+
+        breadcrumbItem.innerHTML = name;
+        UserFunctions.grievancesModalBreadcrumbs.append(breadcrumbItem);
+
+        UserFunctions.addBreadCrumbListeners(breadcrumbItem, id);
+    }
+
+    static addBreadCrumbListeners(breadcrumbItem, id) {
+        let existingCrumbs = [];
+        document.querySelectorAll(`*[${grievancesOptions.modalDataRole}="${grievancesOptions.grievanceGeneratedBreadCrumb}"]`).forEach(function (value) {
+            existingCrumbs.push(value.getAttribute(grievancesOptions.breadcrumbObjectId));
+        });
+
+        let grievance = UserFunctions.findGrievanceSnapshotFromPath(existingCrumbs);
+
+        console.log(grievance.name);
+        console.log(existingCrumbs);
+
+        if ((grievance !== {}) && (id !== undefined) && (grievance.name !== undefined)) {
+            breadcrumbItem.setAttribute(
+                grievancesOptions.dataKeyModal,
+                id
+            );
+
+            breadcrumbItem.setAttribute(
+                `${grievancesOptions.modalTitleData}`,
+                grievance.name
+            );
+
+            breadcrumbItem.setAttribute(
+                `${grievancesOptions.modalImageData}`,
+                grievance.icon
+            );
+
+            let children = '';
+
+            if (grievance.hasOwnProperty('children')) {
+                children = JSON.stringify(grievance.children);
+            }
+
+            breadcrumbItem.setAttribute(
+                `${grievancesOptions.modalChildrenData}`,
+                children
+            );
+
+            breadcrumbItem.addEventListener('click', function () {
+                let grievanceId = this.getAttribute(`${grievancesOptions.dataKeyModal}`);
+                let title = this.getAttribute(`${grievancesOptions.modalTitleData}`);
+                let source = this.getAttribute(`${grievancesOptions.modalImageData}`);
+                let children = this.getAttribute(`${grievancesOptions.modalChildrenData}`);
+                UserFunctions.loadGrievanceModal(grievanceId, title, source, children);
+            }, false);
+        }
+    }
+
+    static findGrievanceSnapshotFromPath(path = []) {
+        let object = UserFunctions.grievancesSnapshot;
+        let i = 0;
+
+        if (path === []) {
+            return {};
+        }
+
+        path.forEach(function (value) {
+            i++;
+            if (object.hasOwnProperty(value)) {
+                if ((object[value].hasOwnProperty('children')) && (i !== path.length)) {
+                    object = object[value].children;
+                } else {
+                    object = object[value];
+                }
+            }
+        });
+
+        return object;
+    }
+
+    static buildGrievancesBoxes() {
+        Object.entries(UserFunctions.grievancesSnapshot).forEach(([key, value]) => {
+            let children = '';
+
+            if (value.hasOwnProperty('children')) {
+                children = JSON.stringify(value.children);
+            }
+
+            UserFunctions.createBox(UserFunctions.grievancesSection, value.name, value.icon, children, key);
+        });
+    }
+
+    static createBox(wrapperElement, title, icon, children = '', key) {
         let box = document.createElement('div');
         let boxImage = document.createElement('img');
         let boxTitle = document.createElement('div');
 
         box.classList.add(grievancesOptions.boxClass);
+        box.classList.add(cssClassOptions.fadeIn);
         boxImage.classList.add(grievancesOptions.mediaHolderClass);
         boxTitle.classList.add(grievancesOptions.titleHolderClass);
 
@@ -178,9 +362,85 @@ class UserFunctions {
         boxImage.setAttribute('src', icon);
         boxImage.setAttribute('alt', grievancesOptions.mediaAlt);
 
+        box.setAttribute(
+            grievancesOptions.dataTargetModal,
+            `${grievancesOptions.dataTargetModalValue}`
+        );
+
+        box.setAttribute(
+            grievancesOptions.dataKeyModal,
+            key
+        );
+
+        box.setAttribute(
+            `${grievancesOptions.modalTitleData}`,
+            title
+        );
+
+        box.setAttribute(
+            `${grievancesOptions.modalImageData}`,
+            icon
+        );
+
+        box.setAttribute(
+            `${grievancesOptions.modalChildrenData}`,
+            children
+        );
+
+        box.addEventListener('click', function () {
+            let grievanceId = this.getAttribute(`${grievancesOptions.dataKeyModal}`);
+            let title = this.getAttribute(`${grievancesOptions.modalTitleData}`);
+            let source = this.getAttribute(`${grievancesOptions.modalImageData}`);
+            let children = this.getAttribute(`${grievancesOptions.modalChildrenData}`);
+            UserFunctions.loadGrievanceModal(grievanceId, title, source, children);
+        }, false);
+
         box.append(boxImage, boxTitle);
 
-        parent.append(box);
+        wrapperElement.append(box);
+    }
+
+    static loadGrievanceModal(grievanceId, title, source, children) {
+        $(grievancesOptions.dataTargetModalValue).modal('show', this);
+        UserFunctions.setGrievanceModalLoading();
+
+        UserFunctions.loadGrievanceModalTitle(title);
+        UserFunctions.loadGrievanceModalImage(source);
+        UserFunctions.loadGrievanceModalChildren(children);
+        UserFunctions.buildBreadCrumbs(grievanceId);
+
+        setTimeout(function () {
+            UserFunctions.setGrievanceModalLoading(false);
+        }, 500);
+    }
+
+    static loadGrievanceModalTitle(title) {
+        UserFunctions.grievancesModalTitle.innerHTML = title;
+    }
+
+    static loadGrievanceModalImage(source) {
+        UserFunctions.grievancesModalImage.setAttribute('src', source);
+    }
+
+    static loadGrievanceModalChildren(grievanceChildren) {
+        UserFunctions.grievancesModalChildrenSection.innerHTML = '';
+
+        if ((grievanceChildren !== undefined) && (grievanceChildren !== UserFunctions.emptyString)) {
+            Object.entries(JSON.parse(grievanceChildren)).forEach(([key, value]) => {
+                let children = '';
+
+                if (value.hasOwnProperty('children')) {
+                    children = JSON.stringify(value.children);
+                }
+
+                UserFunctions.createBox(UserFunctions.grievancesModalChildrenSection, value.name, value.icon, children, key, value.parent);
+            });
+
+            UserFunctions.grievancesModalInstruction.innerHTML = grievancesOptions.withChildrenInstructions;
+        } else {
+            // TODO: If has steps
+            UserFunctions.grievancesModalInstruction.innerHTML = grievancesOptions.withStepsInstructions;
+        }
     }
 
     static setLoading(isLoading = true) {

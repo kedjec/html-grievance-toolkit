@@ -9,7 +9,7 @@
     <link href="css/style.css" rel="stylesheet"/>
     <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="images/sugt-favicon.ico" type="image/x-icon">
+    <link href="images/sugt-favicon.ico" rel="icon" type="image/x-icon">
 </head>
 <body class="main-body still-loading">
 
@@ -84,7 +84,7 @@
     <section id="home" style="background-color: var(--main-bg-color)">
         <div class="main-section container">
             <div class="content-wrapper">
-                <div id="content-categories" data-role="content-categories-holder"></div>
+                <div data-role="content-categories-holder" id="content-categories"></div>
                 <button class="btn btn-light main-section-button"
                         data-email=""
                         data-role="other-concerns-form-button"
@@ -206,7 +206,7 @@
                 <div class="card-feature">
                     <h5 class="font-weight-bold mb-3 d-block">Sent Concerns</h5>
                     <div class="overflow-auto table-wrapper">
-                        <table class="loading-bar" id="other-concerns-items-wrapper" data-role="other-concerns-table">
+                        <table class="loading-bar" data-role="other-concerns-table" id="other-concerns-items-wrapper">
                             <thead data-has-concerns-role="true">
                             <tr>
                                 <th class="col-concern-key">Concern No.</th>
@@ -219,7 +219,7 @@
                             <tbody data-has-concerns-role="true" data-role="concern-item-holder"></tbody>
                         </table>
 
-                        <div class="alert alert-warning rounded" role="alert" data-has-concerns-role="false">
+                        <div class="alert alert-warning rounded" data-has-concerns-role="false" role="alert">
                             No Data Found
                         </div>
                     </div>
@@ -432,10 +432,10 @@
 
 <!--
 TODO: Add dynamic loading of grievances
-TODO: Add admin CRUD of grievances
 TODO: Add new list section of deans and colleges etc.
 TODO: Add new site logo
-TODO: Complete Footer Links
+
+TODO: Add admin CRUD of grievances
 -->
 <div aria-hidden="true"
      aria-labelledby="other-concerns-form-holder"
@@ -669,6 +669,44 @@ TODO: Complete Footer Links
         </div>
     </div>
 </section>
+
+<div aria-hidden="true" aria-labelledby="grievance-modal" class="modal fade" id="grievance-modal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h5 data-role="grievance-breadcrumbs">
+                        <span class="breadcrumb-item" data-dismiss="modal">Home</span>
+                        <span class="breadcrumb-item" data-role="generated-crumb">Test</span>
+                        <span class="breadcrumb-item" data-role="generated-crumb">Test 2</span>
+                    </h5>
+                </div>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <img alt="grievance-image"
+                         class="grievance-image"
+                         data-role="grievance-image"
+                         id="grievance-image"
+                         src="images/welcome-picture.png"/>
+                    <h2 data-role="grievance-title" id="grievance-title">
+                        Grievance Title
+                    </h2>
+                    <p class="text-center grievance-instructions" data-role="grievance-instructions"></p>
+                </div>
+                <div class="modal-loading" data-role="modal-loading">
+                    <div class="spinner-border" role="status"></div>
+                </div>
+                <div data-role="grievance-children-box" id="grievance-children-box"></div>
+                <div data-role="grievance-steps-box" id="grievance-steps-box"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="js/jquery-3.3.1.slim.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
