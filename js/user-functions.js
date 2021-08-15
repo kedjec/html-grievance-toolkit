@@ -105,6 +105,9 @@ const grievancesOptions = {
     dataTargetModal: 'data-target',
     dataTargetModalValue: '#grievance-modal',
     modalChildrenData: 'data-children',
+    modalStepsData: 'data-steps',
+    modalFlowchartData: 'data-flowchart-image',
+    modalDocumentData: 'data-document-link',
     modalTitleData: 'data-modal-title',
     modalImageData: 'data-modal-image',
     grievanceTitle: '[data-role="grievance-title"]',
@@ -119,6 +122,11 @@ const grievancesOptions = {
     grievanceBreadcrumbName: 'name',
     grievanceBreadcrumbParent: 'parent',
     breadcrumbObjectId: 'data-object-id',
+    stepsSeparator: '!sep!',
+    resourcesFlowchartImageDataRole: '[data-role="flowchart-image"]',
+    resourcesDocumentDataRole: '[data-role="grievance-document"]',
+    resourcesGrievanceNameDataRole: '[data-role="grievance-name"]',
+    defaultGrievanceName: 'Grievance Name',
 }
 
 class UserFunctions {
@@ -132,6 +140,10 @@ class UserFunctions {
     static grievancesModalImage = document.querySelector(`*${(grievancesOptions.grievanceImage)}`);
     static grievancesModalInstruction = document.querySelector(`*${(grievancesOptions.grievanceInstructions)}`);
     static grievancesModalBreadcrumbs = document.querySelector(`*${(grievancesOptions.grievanceBreadCrumbs)}`);
+    static grievancesModalSteps = document.querySelector(`*${(grievancesOptions.grievanceSteps)}`);
+    static grievancesModalResourcesFlowchartImage = document.querySelector(`*${(grievancesOptions.resourcesFlowchartImageDataRole)}`);
+    static grievancesModalResourcesDocument = document.querySelector(`*${(grievancesOptions.resourcesDocumentDataRole)}`);
+    static grievanceModalResourcesName = document.querySelector(`*${(grievancesOptions.resourcesGrievanceNameDataRole)}`);
     static emptyString = '';
     static deletedCookieValue = 'deleted';
     static loggedInCookieName = 'logged-in-user';
@@ -141,8 +153,14 @@ class UserFunctions {
         lastName: '',
         contactNo: '',
         sentConcerns: '',
+        documentLink: '',
+        flowchartImage: '',
     };
-    static grievancesSnapshot = {};
+    static grievancesSnapshot = {
+        name: '',
+        icon: '',
+        steps: ''
+    };
     static grievancesBreadcrumbs = [];
 
     constructor() {
@@ -202,7 +220,7 @@ class UserFunctions {
     }
 
     static removeGeneratedBreadCrumbs() {
-        document.querySelectorAll(`*[${grievancesOptions.modalDataRole}="${grievancesOptions.grievanceGeneratedBreadCrumb}"]`).forEach(function (value, key) {
+        document.querySelectorAll(`*[${grievancesOptions.modalDataRole}="${grievancesOptions.grievanceGeneratedBreadCrumb}"]`).forEach(function (value) {
             value.remove();
         });
     }
@@ -273,10 +291,6 @@ class UserFunctions {
         });
 
         let grievance = UserFunctions.findGrievanceSnapshotFromPath(existingCrumbs);
-
-        console.log(grievance.name);
-        console.log(existingCrumbs);
-
         if ((grievance !== {}) && (id !== undefined) && (grievance.name !== undefined)) {
             breadcrumbItem.setAttribute(
                 grievancesOptions.dataKeyModal,
@@ -294,9 +308,24 @@ class UserFunctions {
             );
 
             let children = '';
+            let steps = '';
+            let documentLink = '';
+            let flowchartImage = '';
 
             if (grievance.hasOwnProperty('children')) {
                 children = JSON.stringify(grievance.children);
+            }
+
+            if (grievance.hasOwnProperty('steps')) {
+                steps = grievance.steps;
+            }
+
+            if (grievance.hasOwnProperty('documentLink')) {
+                documentLink = grievance.documentLink;
+            }
+
+            if (grievance.hasOwnProperty('flowchartImage')) {
+                flowchartImage = grievance.flowchartImage;
             }
 
             breadcrumbItem.setAttribute(
@@ -304,12 +333,30 @@ class UserFunctions {
                 children
             );
 
+            breadcrumbItem.setAttribute(
+                `${grievancesOptions.modalStepsData}`,
+                steps
+            );
+
+            breadcrumbItem.setAttribute(
+                `${grievancesOptions.modalDocumentData}`,
+                documentLink
+            );
+
+            breadcrumbItem.setAttribute(
+                `${grievancesOptions.modalFlowchartData}`,
+                flowchartImage
+            );
+
             breadcrumbItem.addEventListener('click', function () {
                 let grievanceId = this.getAttribute(`${grievancesOptions.dataKeyModal}`);
                 let title = this.getAttribute(`${grievancesOptions.modalTitleData}`);
                 let source = this.getAttribute(`${grievancesOptions.modalImageData}`);
                 let children = this.getAttribute(`${grievancesOptions.modalChildrenData}`);
-                UserFunctions.loadGrievanceModal(grievanceId, title, source, children);
+                let steps = this.getAttribute(`${grievancesOptions.modalStepsData}`);
+                let documentLink = this.getAttribute(`${grievancesOptions.modalDocumentData}`);
+                let flowchartImage = this.getAttribute(`${grievancesOptions.modalFlowchartData}`);
+                UserFunctions.loadGrievanceModal(grievanceId, title, source, children, steps, documentLink, flowchartImage);
             }, false);
         }
     }
@@ -339,16 +386,31 @@ class UserFunctions {
     static buildGrievancesBoxes() {
         Object.entries(UserFunctions.grievancesSnapshot).forEach(([key, value]) => {
             let children = '';
+            let steps = '';
+            let documentLink = '';
+            let flowchartImage = '';
 
             if (value.hasOwnProperty('children')) {
                 children = JSON.stringify(value.children);
             }
 
-            UserFunctions.createBox(UserFunctions.grievancesSection, value.name, value.icon, children, key);
+            if (value.hasOwnProperty('steps')) {
+                steps = value.steps;
+            }
+
+            if (value.hasOwnProperty('documentLink')) {
+                documentLink = value.documentLink;
+            }
+
+            if (value.hasOwnProperty('flowchartImage')) {
+                flowchartImage = value.flowchartImage;
+            }
+
+            UserFunctions.createBox(UserFunctions.grievancesSection, value.name, value.icon, children, key, steps, documentLink, flowchartImage);
         });
     }
 
-    static createBox(wrapperElement, title, icon, children = '', key) {
+    static createBox(wrapperElement, title, icon, children = '', key, steps = '', documentLink = '', flowchartImage = '') {
         let box = document.createElement('div');
         let boxImage = document.createElement('img');
         let boxTitle = document.createElement('div');
@@ -387,12 +449,30 @@ class UserFunctions {
             children
         );
 
+        box.setAttribute(
+            `${grievancesOptions.modalStepsData}`,
+            steps
+        );
+
+        box.setAttribute(
+            `${grievancesOptions.modalDocumentData}`,
+            documentLink
+        );
+
+        box.setAttribute(
+            `${grievancesOptions.modalFlowchartData}`,
+            flowchartImage
+        );
+
         box.addEventListener('click', function () {
             let grievanceId = this.getAttribute(`${grievancesOptions.dataKeyModal}`);
             let title = this.getAttribute(`${grievancesOptions.modalTitleData}`);
             let source = this.getAttribute(`${grievancesOptions.modalImageData}`);
             let children = this.getAttribute(`${grievancesOptions.modalChildrenData}`);
-            UserFunctions.loadGrievanceModal(grievanceId, title, source, children);
+            let steps = this.getAttribute(`${grievancesOptions.modalStepsData}`);
+            let documentLink = this.getAttribute(`${grievancesOptions.modalDocumentData}`);
+            let flowchartImage = this.getAttribute(`${grievancesOptions.modalFlowchartData}`);
+            UserFunctions.loadGrievanceModal(grievanceId, title, source, children, steps, documentLink, flowchartImage);
         }, false);
 
         box.append(boxImage, boxTitle);
@@ -400,18 +480,82 @@ class UserFunctions {
         wrapperElement.append(box);
     }
 
-    static loadGrievanceModal(grievanceId, title, source, children) {
+    static loadGrievanceModal(grievanceId, title, source, children, steps, documentLink = '', flowchartImage = '') {
         $(grievancesOptions.dataTargetModalValue).modal('show', this);
         UserFunctions.setGrievanceModalLoading();
-
         UserFunctions.loadGrievanceModalTitle(title);
         UserFunctions.loadGrievanceModalImage(source);
-        UserFunctions.loadGrievanceModalChildren(children);
+        UserFunctions.loadGrievanceModalChildren(children, steps);
         UserFunctions.buildBreadCrumbs(grievanceId);
+        UserFunctions.loadGrievanceSteps(steps);
+        UserFunctions.loadResources(title, documentLink, flowchartImage);
 
         setTimeout(function () {
             UserFunctions.setGrievanceModalLoading(false);
         }, 500);
+    }
+
+    static loadResources(title, documentLink, flowchartImage) {
+        let grievanceName = title;
+
+        if (title !== UserFunctions.emptyString) {
+            grievanceName = title;
+        } else {
+            grievanceName = grievancesOptions.defaultGrievanceName;
+        }
+
+        UserFunctions.grievanceModalResourcesName.innerHTML = grievanceName;
+
+        if (flowchartImage === UserFunctions.emptyString) {
+            UserFunctions.grievancesModalResourcesFlowchartImage.classList.add(cssClassOptions.displayNone);
+            UserFunctions.grievancesModalResourcesFlowchartImage.removeAttribute('download');
+            UserFunctions.grievancesModalResourcesFlowchartImage.removeAttribute('href');
+        } else {
+            UserFunctions.grievancesModalResourcesFlowchartImage.classList.remove(cssClassOptions.displayNone);
+            UserFunctions.grievancesModalResourcesFlowchartImage.setAttribute(
+                'href',
+                `${grievanceName} Flowchart Image`
+            );
+            UserFunctions.grievancesModalResourcesFlowchartImage.setAttribute(
+                'download',
+                flowchartImage
+            );
+        }
+
+        if (documentLink === UserFunctions.emptyString) {
+            UserFunctions.grievancesModalResourcesDocument.classList.add(cssClassOptions.displayNone);
+            UserFunctions.grievancesModalResourcesDocument.removeAttribute('download');
+            UserFunctions.grievancesModalResourcesDocument.removeAttribute('href');
+        } else {
+            UserFunctions.grievancesModalResourcesDocument.classList.remove(cssClassOptions.displayNone);
+            UserFunctions.grievancesModalResourcesDocument.setAttribute(
+                'download',
+                `${grievanceName} Pre-formatted Letter`
+            );
+            UserFunctions.grievancesModalResourcesDocument.setAttribute(
+                'href',
+                documentLink
+            );
+        }
+    }
+
+    static loadGrievanceSteps(steps = '') {
+        UserFunctions.grievancesModalSteps.innerHTML = '';
+
+        if (steps === UserFunctions.emptyString) {
+            return false;
+        }
+
+        if ((steps !== undefined) && (steps !== UserFunctions.emptyString)) {
+            let stepsList = document.createElement('ol');
+            steps.split(grievancesOptions.stepsSeparator).forEach(function (value) {
+                let listItem = document.createElement('li');
+                listItem.innerHTML = value;
+                stepsList.append(listItem);
+            });
+
+            UserFunctions.grievancesModalSteps.append(stepsList);
+        }
     }
 
     static loadGrievanceModalTitle(title) {
@@ -422,23 +566,39 @@ class UserFunctions {
         UserFunctions.grievancesModalImage.setAttribute('src', source);
     }
 
-    static loadGrievanceModalChildren(grievanceChildren) {
+    static loadGrievanceModalChildren(grievanceChildren, steps = '') {
         UserFunctions.grievancesModalChildrenSection.innerHTML = '';
 
         if ((grievanceChildren !== undefined) && (grievanceChildren !== UserFunctions.emptyString)) {
             Object.entries(JSON.parse(grievanceChildren)).forEach(([key, value]) => {
                 let children = '';
+                let steps = '';
+                let documentLink = '';
+                let flowchartImage = '';
 
                 if (value.hasOwnProperty('children')) {
                     children = JSON.stringify(value.children);
                 }
 
-                UserFunctions.createBox(UserFunctions.grievancesModalChildrenSection, value.name, value.icon, children, key, value.parent);
+                if (value.hasOwnProperty('steps')) {
+                    steps = value.steps;
+                }
+
+                if (value.hasOwnProperty('documentLink')) {
+                    documentLink = value.documentLink;
+                }
+
+                if (value.hasOwnProperty('flowchartImage')) {
+                    flowchartImage = value.flowchartImage;
+                }
+
+                UserFunctions.createBox(UserFunctions.grievancesModalChildrenSection, value.name, value.icon, children, key, steps, documentLink, flowchartImage);
             });
 
             UserFunctions.grievancesModalInstruction.innerHTML = grievancesOptions.withChildrenInstructions;
-        } else {
-            // TODO: If has steps
+        }
+
+        if (steps !== UserFunctions.emptyString) {
             UserFunctions.grievancesModalInstruction.innerHTML = grievancesOptions.withStepsInstructions;
         }
     }

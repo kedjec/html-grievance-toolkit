@@ -432,6 +432,7 @@
 
 <!--
 TODO: Add dynamic loading of grievances
+TODO: ADD DOWNLOAD LINKS
 TODO: Add new list section of deans and colleges etc.
 TODO: Add new site logo
 
@@ -703,6 +704,47 @@ TODO: Add admin CRUD of grievances
                 </div>
                 <div data-role="grievance-children-box" id="grievance-children-box"></div>
                 <div data-role="grievance-steps-box" id="grievance-steps-box"></div>
+                <div id="grievance-resources">
+                    <h1 class="resources-title">Resources</h1>
+                    <div class="resources-wrapper" data-role="resources-wrapper">
+                        <a class="resources-item"
+                           data-role="flowchart-image"
+                           download="Grievance-Name"
+                           href="images/flowcharts/STT_Harrassment.jpg">
+                            <i class="fas fa-image resources-icon"></i>
+                            <div class="resources-text">
+                                <h5>Process Flowchart</h5>
+                                <p>
+                                    A step by step guide on how to process your grievance, all in one image.
+                                </p>
+                            </div>
+                        </a>
+
+                        <a class="resources-item"
+                           data-role="grievance-document"
+                           download="Grievance-Name-Doc"
+                           href="letters/STT-Harassment.docx">
+                            <i class="far fa-envelope resources-icon"></i>
+                            <div class="resources-text">
+                                <h5>Download Letter</h5>
+                                <p>
+                                    Pre-formatted letter for
+                                    <span data-role="grievance-name">Grievance Name</span>.
+                                </p>
+                            </div>
+                        </a>
+
+                        <div class="resources-badges">
+                            <i class="far fa-list-alt resources-icon"></i>
+                            <div class="resources-text">
+                                <h5>Directory List</h5>
+                                <p>
+                                    Contact Department Deans or Heads.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

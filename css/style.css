@@ -457,6 +457,99 @@ body .btn-secondary:hover {
     transition: transform 0.2s;
 }
 
+div#grievance-steps-box {
+    padding: 2em 0;
+}
+
+div#grievance-steps-box > ol {
+    counter-reset: my-awesome-counter;
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+
+div#grievance-steps-box > ol li {
+    align-items: start;
+    counter-increment: my-awesome-counter;
+    display: flex;
+    font-size: 1.2rem;
+    line-height: 1.8em;
+    margin-bottom: 1.5em;
+}
+
+div#grievance-steps-box > ol li:before {
+    align-items: center;
+    background: var(--darkTransparent);
+    border-radius: 100px;
+    color: white;
+    content: counter(my-awesome-counter);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 1rem;
+    font-weight: bold;
+    height: 40px;
+    justify-content: center;
+    margin-right: 10px;
+    margin-top: -3px;
+    width: 40px;
+}
+
+div#grievance-steps-box > ol li::marker {
+    display: none;
+}
+
+#grievance-modal .resources-wrapper {
+    column-gap: 2em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 2em 0 4em;
+    padding: 0 1em;
+    row-gap: 2em;
+}
+
+#grievance-modal .resources-title {
+    font-weight: bold;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+#grievance-modal .resources-wrapper > * {
+    background: var(--darkTransparent);
+    border-radius: 1em;
+    box-shadow: var(--site-shadow);
+    display: grid;
+    flex: 1 1 250px;
+    grid-template-rows: 140px 1fr;
+    padding: 2em;
+    text-align: center;
+    transition: 0.2s;
+    max-width: 350px;
+}
+
+#grievance-modal .resources-icon {
+    align-items: center;
+    color: white;
+    display: flex;
+    font-size: 4em;
+    justify-content: center;
+    margin-bottom: 0.5em;
+}
+
+#grievance-modal .resources-wrapper > *:hover {
+    text-decoration: none;
+    cursor: pointer;
+    transform: scale(1.05);
+    transition: 0.3s;
+}
+
+#grievance-modal .resources-text * {
+    color: white;
+}
+
+#grievance-modal .resources-text p:last-child {
+    margin: 0;
+}
 
 #content-categories > .grievance-box .media-wrapper {
     display: block;
@@ -809,7 +902,7 @@ body .btn-secondary:hover {
 
 /* Grievance Modal */
 .modal-loading + #grievance-children-box,
-.modal-loading + #grievance-steps-box {
+.modal-loading + #grievance-children-box + #grievance-steps-box {
     display: none;
 }
 
@@ -818,8 +911,12 @@ body .btn-secondary:hover {
     padding: 0 1em;
 }
 
-.modal-loading.d-none + #grievance-steps-box {
+.modal-loading.d-none + #grievance-children-box + #grievance-steps-box {
     display: block;
+}
+
+div#grievance-children-box:empty {
+    display: none !important;
 }
 
 #grievance-modal {
@@ -1016,8 +1113,12 @@ body .btn-secondary:hover {
 }
 
 @keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 #site-loading {
