@@ -520,11 +520,11 @@ div#grievance-steps-box > ol li::marker {
     box-shadow: var(--site-shadow);
     display: grid;
     flex: 1 1 250px;
-    grid-template-rows: 140px 1fr;
+    grid-template-rows: 100px 1fr;
+    max-width: 350px;
     padding: 2em;
     text-align: center;
     transition: 0.2s;
-    max-width: 350px;
 }
 
 #grievance-modal .resources-icon {
@@ -537,10 +537,15 @@ div#grievance-steps-box > ol li::marker {
 }
 
 #grievance-modal .resources-wrapper > *:hover {
-    text-decoration: none;
     cursor: pointer;
+    text-decoration: none;
     transform: scale(1.05);
     transition: 0.3s;
+}
+
+#grievance-modal .resources-wrapper > *:active {
+    transform: scale(0.95);
+    transition: 0.2s;
 }
 
 #grievance-modal .resources-text * {
@@ -1002,6 +1007,82 @@ div#grievance-children-box:empty {
     text-decoration: underline;
 }
 
+#directory-table-modal .modal-dialog {
+    max-width: 1000px;
+}
+
+#directory-table-modal .modal-header {
+    border-bottom: 0;
+}
+
+#directory-table {
+    border-bottom: 0;
+}
+
+#directory-table th {
+    white-space: nowrap;
+}
+
+#directory-table td, table#directory-table th {
+    border-bottom: 0;
+}
+
+#directory-table th:hover {
+    cursor: pointer;
+}
+
+#directory-table tr {
+    border-bottom: 1px solid gainsboro;
+}
+
+#directory-table-modal .modal-content, #directory-table-modal .modal-content {
+    padding: 1.5rem;
+}
+
+#directory-table-modal td,
+#directory-table-modal th {
+    padding: 10px 25px 10px 0;
+    min-width: 100px;
+    width: 50%;
+}
+
+#directory-table-modal th {
+    white-space: nowrap;
+}
+
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: white !important;
+    border: 1px solid transparent;
+    background: var(--darkTransparent);
+}
+
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button {
+    margin-left: 2px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+}
+
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    color: var(--darkTransparent) !important;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: default;
+}
+
+#directory-table-modal #directory-table_wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 0.5em;
+    align-items: center;
+}
+
+#directory-table-modal #directory-table_wrapper > * {
+    padding: 0;
+    margin: 0;
+    flex: 1 1 auto;
+}
+
 #grievance-children-box > .grievance-box {
     background: var(--lightTransparent);
     border-radius: 1em;
@@ -1048,6 +1129,18 @@ div#grievance-children-box:empty {
 
     #grievance-modal .modal-header .breadcrumb-item {
         font-size: 1rem;
+    }
+
+    div#directory-table-modal .modal-content, #directory-table-modal .modal-content {
+        padding: 0;
+    }
+
+    #directory-table-modal td, #directory-table-modal th {
+        padding: 2px 15px 2px 0;
+        min-width: unset;
+        width: auto;
+        font-size: 0.7rem;
+        word-break: break-all;
     }
 }
 

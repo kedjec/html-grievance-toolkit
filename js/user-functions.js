@@ -750,7 +750,8 @@ class UserFunctions {
                 UserFunctions.displayAlert(UserFunctions.loginForm, cssClassOptions.alertSuccess, loginOptions.adminSuccessfulLogInMessage);
 
                 UserFunctions.sleep(1000).then(() => {
-                    window.location.replace('/admin-dashboard.html');
+                    // TODO: Change This
+                    window.location.replace(`/html-grievance-toolkit/admin-dashboard.html`);
                 });
             } else {
                 let loggedInUser = firebase.auth().currentUser;
