@@ -1041,8 +1041,8 @@ div#grievance-children-box:empty {
 
 #directory-table-modal td,
 #directory-table-modal th {
-    padding: 10px 25px 10px 0;
     min-width: 100px;
+    padding: 10px 25px 10px 0;
     width: 50%;
 }
 
@@ -1052,39 +1052,39 @@ div#grievance-children-box:empty {
 
 #directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button.current,
 #directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    color: white !important;
-    border: 1px solid transparent;
     background: var(--darkTransparent);
+    border: 1px solid transparent;
+    color: white !important;
 }
 
 #directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button {
+    border: 1px solid transparent;
     margin-left: 2px;
     padding: 5px 10px;
-    border: 1px solid transparent;
 }
 
 #directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
-    color: var(--darkTransparent) !important;
-    border: 1px solid transparent;
     background: transparent;
+    border: 1px solid transparent;
+    color: var(--darkTransparent) !important;
     cursor: default;
 }
 
 #directory-table-modal #directory-table_wrapper {
+    align-items: center;
     display: flex;
     flex-wrap: wrap;
     grid-gap: 0.5em;
-    align-items: center;
 }
 
 #directory-table-modal #directory-table_wrapper > * {
-    padding: 0;
-    margin: 0;
     flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
 }
 
 #grievance-children-box > .grievance-box {
-    background: var(--lightTransparent);
+    background: #9dd4d6;
     border-radius: 1em;
     box-shadow: var(--site-shadow);
     cursor: pointer;
@@ -1108,7 +1108,7 @@ div#grievance-children-box:empty {
 
 #grievance-children-box > .grievance-box .media-wrapper {
     display: block;
-    height: 140px;
+    height: 100px;
     margin: auto;
     min-height: 20px;
     width: auto;
@@ -1136,10 +1136,10 @@ div#grievance-children-box:empty {
     }
 
     #directory-table-modal td, #directory-table-modal th {
-        padding: 2px 15px 2px 0;
-        min-width: unset;
-        width: auto;
         font-size: 0.7rem;
+        min-width: unset;
+        padding: 2px 15px 2px 0;
+        width: auto;
         word-break: break-all;
     }
 }
@@ -1224,4 +1224,106 @@ div#grievance-children-box:empty {
     top: 0;
     width: 100vw;
     z-index: 99999;
+}
+
+/* Admin */
+.admin-page {
+    background: transparent;
+}
+
+.admin-page .admin-section {
+    background: white;
+    border-radius: 8px;
+    margin: 1.5em;
+    padding: 1.5em;
+}
+
+.admin-page .grievance-list {
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.admin-page .grievance-list > * {
+    flex: 1 1 350px;
+    max-width: 350px;
+}
+
+.admin-page .grievance-list .grievance-item {
+    background: white;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name {
+    align-items: center;
+    border-radius: 4px;
+    column-gap: 1em;
+    display: flex;
+    max-width: 100%;
+    padding: 0.5em;
+    row-gap: 1em;
+    width: fit-content;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name:hover {
+    background-color: #e3e3e3;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.admin-page .grievance-list .grievance-item .children-list .grievance-item {
+    padding: 0 1em;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name .actions button {
+    border: 0;
+    border-radius: 4px;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name .actions button > * {
+    color: white;
+    font-size: 0.8em;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name .actions {
+    align-items: center;
+    column-gap: 10px;
+    display: flex;
+    row-gap: 10px;
+    visibility: hidden;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name:hover .actions {
+    visibility: visible;
+}
+
+.admin-page .grievance-list .grievance-item .children-list {
+    overflow: hidden;
+    position: relative;
+}
+
+.admin-page .grievance-list .grievance-item .children-list:not(:empty):after {
+    background: #e3e3e3;
+    content: '';
+    height: 100%;
+    left: 11px;
+    position: absolute;
+    top: 0;
+    width: 2px;
+}
+
+.admin-page .grievance-list .grievance-item .children-list .grievance-item-name:after {
+    background: #e3e3e3;
+    content: '';
+    height: 2px;
+    left: 11px;
+    position: absolute;
+    width: 6px;
+}
+
+#edit-grievance-form .submit-button,
+#add-grievance-form .submit-button {
+    display: block;
+    margin: auto 0 auto auto;
 }

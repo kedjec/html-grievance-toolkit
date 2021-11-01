@@ -496,7 +496,7 @@ class UserFunctions {
     }
 
     static loadResources(title, documentLink, flowchartImage) {
-        let grievanceName = title;
+        let grievanceName;
 
         if (title !== UserFunctions.emptyString) {
             grievanceName = title;
@@ -513,11 +513,11 @@ class UserFunctions {
         } else {
             UserFunctions.grievancesModalResourcesFlowchartImage.classList.remove(cssClassOptions.displayNone);
             UserFunctions.grievancesModalResourcesFlowchartImage.setAttribute(
-                'href',
+                'download',
                 `${grievanceName} Flowchart Image`
             );
             UserFunctions.grievancesModalResourcesFlowchartImage.setAttribute(
-                'download',
+                'href',
                 flowchartImage
             );
         }
@@ -1113,5 +1113,271 @@ class UserFunctions {
 
     static sleep(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
+    }
+}
+
+const adminOptions = {
+    listOfGrievancesDataRole: '[data-role="list-of-grievances"]',
+    homepageLink: 'http://localhost:63342/html-grievance-toolkit/',
+    grievanceItemClassName: 'grievance-item',
+    grievanceItemNameClassName: 'grievance-item-name',
+    grievanceItemChildrenListClassName: 'children-list',
+    grievancesActionClassName: 'actions',
+    grievancesActionEditClassName: 'edit-button',
+    grievancesActionAddChildClassName: 'add-child-button',
+    dataAncestorAttributeName: 'data-ancestor',
+    editGrievanceModal: '#edit-grievance-modal',
+    editGrievanceForm: '#edit-grievance-form',
+    addGrievanceModal: '#add-grievance-modal',
+    addGrievanceForm: '#add-grievance-form',
+    addGrievanceUnderDataRole: '[data-role="add-grievance-under"]',
+    databaseTargetAttribute: 'data-database-target'
+}
+
+class AdminFunctions {
+    static grievancesList = document.querySelector(`*${(adminOptions.listOfGrievancesDataRole)}`);
+    static editGrievanceModalForm = document.querySelector(`${(adminOptions.editGrievanceForm)}`);
+    static addGrievanceModal = document.querySelector(`${(adminOptions.addGrievanceModal)}`);
+    static addGrievanceModalForm = document.querySelector(`${(adminOptions.addGrievanceForm)}`);
+
+    static grievancesSnapshot = {
+        name: '',
+        icon: '',
+        steps: ''
+    };
+
+    static userSnapshot = {
+        firstName: '',
+        lastName: '',
+        contactNo: '',
+        sentConcerns: '',
+        documentLink: '',
+        flowchartImage: '',
+    };
+
+    constructor() {
+        let userId = UserFunctions.isUserLoggedIn();
+        if (userId) {
+            firebase.database().ref(`${firebaseConfig.db_users}/` + userId).once('value').then(function (snapshot) {
+                AdminFunctions.userSnapshot = snapshot.val();
+                AdminFunctions.userSnapshot.userId = userId;
+                AdminFunctions.loadGrievances();
+                AdminFunctions.setEditGrievanceFormListener();
+                AdminFunctions.setAddGrievanceFormListener();
+            }).catch(function () {
+                UserFunctions.deleteCookie(UserFunctions.loggedInCookieName);
+                AdminFunctions.redirectToHome();
+            });
+        } else {
+            AdminFunctions.redirectToHome();
+        }
+    }
+
+    static loadGrievances() {
+        firebase.database().ref(`${firebaseConfig.db_grievances}`).once('value').then(function (snapshot) {
+            AdminFunctions.grievancesSnapshot = snapshot.val();
+            Object.entries(AdminFunctions.grievancesSnapshot).forEach(([key, value]) => {
+                AdminFunctions.addToList(key, value.name, value.children, AdminFunctions.grievancesList, key);
+            });
+        }).catch(function () {
+            alert('Error in loading the data');
+        });
+    }
+
+    static addToList(id = '', name = '', children = {}, elementToAdd, ancestor = '') {
+        if ((id === '') || (name === '')) {
+            return false;
+        }
+
+        let grievanceItem = document.createElement('div');
+        let grievanceItemName = document.createElement('div');
+        let grievanceName = document.createElement('span');
+        let editButton = document.createElement("button");
+        let addChildButton = document.createElement("button");
+        let actions = document.createElement('div');
+
+        actions.classList.add(adminOptions.grievancesActionClassName);
+        grievanceItem.classList.add(adminOptions.grievanceItemClassName);
+        grievanceItem.setAttribute('id', id);
+
+        if (ancestor !== '') {
+            grievanceItem.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
+            editButton.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
+            addChildButton.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
+        }
+
+        addChildButton.innerHTML = "<i class=\"fas fa-plus\"></i>";
+        addChildButton.classList.add('bg-success');
+        addChildButton.classList.add(adminOptions.grievancesActionAddChildClassName);
+        addChildButton.addEventListener('click', function () {
+            AdminFunctions.openAddGrievanceModal(this);
+        });
+        actions.append(addChildButton);
+
+        editButton.innerHTML = "<i class=\"fas fa-edit\"></i>";
+        editButton.classList.add('bg-info');
+        editButton.classList.add(adminOptions.grievancesActionEditClassName);
+        editButton.addEventListener('click', function () {
+            AdminFunctions.openEditGrievanceModal(this);
+        });
+        actions.append(editButton);
+
+        grievanceName.innerHTML = name;
+        grievanceItemName.append(grievanceName);
+        grievanceItemName.classList.add(adminOptions.grievanceItemNameClassName);
+        grievanceItemName.append(actions);
+
+        grievanceItem.append(grievanceItemName);
+
+        if (children) {
+            let childrenList = document.createElement('div');
+            childrenList.classList.add(adminOptions.grievanceItemChildrenListClassName);
+
+            Object.entries(children).forEach(([key, value]) => {
+                let newAncestor;
+
+                if (ancestor !== '') {
+                    newAncestor = `${ancestor},${key}`;
+                } else {
+                    newAncestor = `${key}`;
+                }
+
+                AdminFunctions.addToList(key, value.name, value.children, childrenList, newAncestor);
+            });
+
+            grievanceItem.append(childrenList);
+        }
+
+        elementToAdd.append(grievanceItem);
+    }
+
+    static redirectToHome() {
+        alert("Invalid User");
+        window.location.replace(`${adminOptions.homepageLink}`);
+    }
+
+    static openEditGrievanceModal(element) {
+        let dataAncestor = element.getAttribute(adminOptions.dataAncestorAttributeName).split(",");
+        let databaseQuery = `${firebaseConfig.db_grievances}`;
+        let iterator = 1;
+        let specificSnapshot = AdminFunctions.grievancesSnapshot;
+
+        dataAncestor.forEach(function (value) {
+            if ((dataAncestor.length > 1) && (iterator !== dataAncestor.length)) {
+                databaseQuery += `/${value}/children`;
+                specificSnapshot = specificSnapshot[value].children;
+            } else {
+                databaseQuery += `/${value}`;
+                specificSnapshot = specificSnapshot[value];
+            }
+            iterator++;
+        });
+
+        AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-name`).value = (specificSnapshot.name !== undefined) ? specificSnapshot.name : '';
+        AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-documentLink`).value = (specificSnapshot.documentLink !== undefined) ? specificSnapshot.documentLink : '';
+        AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-flowchartImage`).value = (specificSnapshot.flowchartImage !== undefined) ? specificSnapshot.flowchartImage : '';
+        AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-icon`).value = (specificSnapshot.icon !== undefined) ? specificSnapshot.icon : '';
+        AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-steps`).value = (specificSnapshot.steps !== undefined) ? specificSnapshot.steps : '';
+        AdminFunctions.editGrievanceModalForm.querySelector(`*[type="submit"]`).setAttribute(adminOptions.databaseTargetAttribute, databaseQuery);
+        $(adminOptions.editGrievanceModal).modal('show', this);
+    }
+
+    static openAddGrievanceModal(element) {
+        let dataAncestor = element.getAttribute(adminOptions.dataAncestorAttributeName).split(",");
+        let databaseQuery = `${firebaseConfig.db_grievances}`;
+        let iterator = 1;
+        let specificSnapshot = AdminFunctions.grievancesSnapshot;
+
+        dataAncestor.forEach(function (value) {
+            if ((dataAncestor.length > 1) && (iterator !== dataAncestor.length)) {
+                databaseQuery += `/${value}/children`;
+                specificSnapshot = specificSnapshot[value].children;
+            } else {
+                databaseQuery += `/${value}`;
+                specificSnapshot = specificSnapshot[value];
+            }
+            iterator++;
+        });
+
+        AdminFunctions.addGrievanceModal.querySelector(`*${adminOptions.addGrievanceUnderDataRole}`).innerHTML = specificSnapshot.name;
+        AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-name`).value = '';
+        AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-documentLink`).value = '';
+        AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-flowchartImage`).value = '';
+        AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-icon`).value = '';
+        AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-steps`).value = '';
+        AdminFunctions.addGrievanceModal.querySelector(`#add-grievance-form-parent`).value = dataAncestor[dataAncestor.length - 1];
+        AdminFunctions.addGrievanceModal.querySelector(`*[type="submit"]`).setAttribute(adminOptions.databaseTargetAttribute, databaseQuery);
+
+        $(adminOptions.addGrievanceModal).modal('show', this);
+    }
+
+    static setEditGrievanceFormListener() {
+        AdminFunctions.editGrievanceModalForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            let target = AdminFunctions.editGrievanceModalForm.querySelector(`*[type="submit"]`).getAttribute(adminOptions.databaseTargetAttribute);
+            let newData = {};
+
+            if ((target === undefined) || (target === null) || (target === '')) {
+                alert('Editing Grievance Failed');
+                return 0;
+            }
+
+            newData.name = AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-name`).value;
+            newData.documentLink = AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-documentLink`).value;
+            newData.flowchartImage = AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-flowchartImage`).value;
+            newData.icon = AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-icon`).value;
+            newData.steps = AdminFunctions.editGrievanceModalForm.querySelector(`#edit-grievance-form-steps`).value;
+
+            database.ref(`${target}`).update(newData, function (error) {
+                if (error) {
+                    alert('Editing Grievance Failed');
+                } else {
+                    window.location.reload();
+                }
+            });
+        }, false);
+    }
+
+    static setAddGrievanceFormListener() {
+        AdminFunctions.addGrievanceModalForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            let target = AdminFunctions.addGrievanceModalForm.querySelector(`*[type="submit"]`).getAttribute(adminOptions.databaseTargetAttribute) + '/children';
+            let newData = {};
+            let errorMessages = '';
+
+            if ((target === undefined) || (target === null) || (target === '')) {
+                errorMessages += 'Adding Grievance Failed. ';
+            }
+
+            if (AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-name`).value === '') {
+                errorMessages += 'Missing Grievance Name. ';
+            }
+
+            if (AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-parent`).value === '') {
+                errorMessages += 'Missing Parent Grievance. ';
+            }
+
+            if (errorMessages !== '') {
+                alert(errorMessages);
+                return 0;
+            }
+
+            newData.name = AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-name`).value;
+            newData.documentLink = AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-documentLink`).value;
+            newData.flowchartImage = AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-flowchartImage`).value;
+            newData.icon = AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-icon`).value;
+            newData.steps = AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-steps`).value;
+            newData.parent = AdminFunctions.addGrievanceModalForm.querySelector(`#add-grievance-form-parent`).value;
+
+            let newGrievance = database.ref(`${target}`).push();
+
+            newGrievance.set(newData, function (error) {
+                if (error) {
+                    alert('Adding Grievance Failed');
+                } else {
+                    window.location.reload();
+                }
+            });
+        }, false);
     }
 }
