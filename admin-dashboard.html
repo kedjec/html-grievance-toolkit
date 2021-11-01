@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+
+    <title>GTK Admin</title>
+
+    <link href="css/style.css" rel="stylesheet"/>
+    <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="images/sugt-favicon.ico" rel="icon" type="image/x-icon">
+</head>
+<body class="admin-page">
+
+<section class="admin-section" id="grievance-crud">
+    <h2 class="section-title">Manage Grievances</h2>
+
+    <div class="grievance-list" data-role="list-of-grievances"></div>
+</section>
+
+<div aria-hidden="true" aria-labelledby="grievance-modal" class="modal fade" id="edit-grievance-modal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <strong>Edit Grievance</strong>
+                </div>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-grievance-form">
+                    <div class="form-group">
+                        <label for="edit-grievance-form-name">Grievance Name</label>
+                        <input class="form-control"
+                               id="edit-grievance-form-name"
+                               name="name"
+                               placeholder="Grievance Name"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-grievance-form-documentLink">Document Link Path</label>
+                        <input class="form-control"
+                               id="edit-grievance-form-documentLink"
+                               name="documentLink"
+                               placeholder="Document Link Path"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-grievance-form-icon">Icon Link Path</label>
+                        <input class="form-control"
+                               id="edit-grievance-form-icon"
+                               name="icon"
+                               placeholder="Icon Link Path"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-grievance-form-flowchartImage">Flowchart Image Path</label>
+                        <input class="form-control"
+                               id="edit-grievance-form-flowchartImage"
+                               name="flowchartImage"
+                               placeholder="Flowchart Image Path"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-grievance-form-steps">Steps</label>
+                        <textarea class="form-control"
+                                  id="edit-grievance-form-steps"
+                                  name="steps"
+                                  rows="8"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary submit-button" data-database-target="" type="submit">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="grievance-modal" class="modal fade" id="add-grievance-modal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>Adding New Grievance under <strong data-role="add-grievance-under">root</strong></span>
+                </div>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-grievance-form">
+                    <div class="form-group">
+                        <label for="add-grievance-form-name">Grievance Name</label>
+                        <input class="form-control"
+                               id="add-grievance-form-name"
+                               name="name"
+                               placeholder="Grievance Name"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="add-grievance-form-documentLink">Document Link Path</label>
+                        <input class="form-control"
+                               id="add-grievance-form-documentLink"
+                               name="documentLink"
+                               placeholder="Document Link Path"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="add-grievance-form-icon">Icon Link Path</label>
+                        <input class="form-control"
+                               id="add-grievance-form-icon"
+                               name="icon"
+                               placeholder="Icon Link Path"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="add-grievance-form-flowchartImage">Flowchart Image Path</label>
+                        <input class="form-control"
+                               id="add-grievance-form-flowchartImage"
+                               name="flowchartImage"
+                               placeholder="Flowchart Image Path"
+                               type="text"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="add-grievance-form-steps">Steps</label>
+                        <textarea class="form-control"
+                                  id="add-grievance-form-steps"
+                                  name="steps"
+                                  rows="8"></textarea>
+                    </div>
+
+                    <input id="add-grievance-form-parent"
+                           name="parent"
+                           type="hidden"
+                           value="root"/>
+
+                    <button class="btn btn-primary submit-button" data-database-target="" type="submit">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/jquery-3.3.1.slim.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/header.js"></script>
+<script src="js/form-validation.js"></script>
+<script src="js/user-functions.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.2.0/firebase.js"></script>
+<script src="js/firebase.js"></script>
+
+<script>
+    new AdminFunctions();
+</script>
+</body>
+</html>

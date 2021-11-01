@@ -8,6 +8,8 @@
 
     <link href="css/style.css" rel="stylesheet"/>
     <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="images/sugt-favicon.ico" rel="icon" type="image/x-icon">
 </head>
@@ -430,14 +432,6 @@
     </section>
 </div>
 
-<!--
-TODO: Add dynamic loading of grievances
-TODO: ADD DOWNLOAD LINKS
-TODO: Add new list section of deans and colleges etc.
-TODO: Add new site logo
-
-TODO: Add admin CRUD of grievances
--->
 <div aria-hidden="true"
      aria-labelledby="other-concerns-form-holder"
      class="modal fade site-modals"
@@ -671,6 +665,258 @@ TODO: Add admin CRUD of grievances
     </div>
 </section>
 
+<div aria-hidden="true"
+     aria-labelledby="directory-table"
+     class="modal fade"
+     id="directory-table-modal"
+     role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Directory List</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="overflow-auto">
+                    <table class="directory-table" id="directory-table">
+                        <thead>
+                        <tr>
+                            <th class="department-column">Department</th>
+                            <th class="head-column">Dean / Head</th>
+                            <th class="email-column">Email</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="department-column">College of Agriculture</td>
+                            <td class="head-column">Dean Jose Edwin C. Cubelo</td>
+                            <td class="email-column">
+                                <a href="mailto:aggies@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    aggies@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Arts and Sciences</td>
+                            <td class="head-column">Dean Mar Brigitt Bernadel L. Villordon</td>
+                            <td class="email-column">
+                                <a href="mailto:cas@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    cas@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Business Administration</td>
+                            <td class="head-column">Dean Gloria G. Futalan</td>
+                            <td class="email-column">
+                                <a href="mailto:cba@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    cba@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Computer Studies</td>
+                            <td class="head-column">OIC Dean Joy M. Dy</td>
+                            <td class="email-column">
+                                <a href="mailto:ccs@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    ccs@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Education</td>
+                            <td class="head-column">Dean Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:coe@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    coe@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Engineering and Design</td>
+                            <td class="head-column">Dean Maria Lorena L. Tuballa</td>
+                            <td class="email-column">
+                                <a href="mailto:eng_g@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    eng_g@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Law</td>
+                            <td class="head-column">Dean Myles Nicholas G. Bejar</td>
+                            <td class="email-column">
+                                <a href="mailto:law@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    law@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Mass Communication</td>
+                            <td class="head-column">Dean Madeline B. Quiamco</td>
+                            <td class="email-column">
+                                <a href="mailto:masscom@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    masscom@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Nursing</td>
+                            <td class="head-column">Dean Theresa A. Guino-o</td>
+                            <td class="email-column">
+                                <a href="mailto:sucn@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    sucn@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">College of Performing Visual Arts</td>
+                            <td class="head-column">Dean Elizabeth Susan Vista-Suarez</td>
+                            <td class="email-column">
+                                <a href="mailto:copva@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    copva@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Divinity School</td>
+                            <td class="head-column">Dean Jeaneth H. Faller</td>
+                            <td class="email-column">
+                                <a href="mailto:divinity@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    divinity@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Graduate Programs</td>
+                            <td class="head-column">Dean Margaret Helen U. Alvarez</td>
+                            <td class="email-column">
+                                <a href="mailto:graduate@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    graduate@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Institute of Clinical Laboratory Sciences</td>
+                            <td class="head-column">Director Evelyn S. Fajardo</td>
+                            <td class="email-column">
+                                <a href="mailto:medtech@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    medtech@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Institute of Service Learning</td>
+                            <td class="head-column">Director Emervencia L. Ligutom</td>
+                            <td class="email-column">
+                                <a href="mailto:servicelearning@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    servicelearning@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Medical School</td>
+                            <td class="head-column">Dean Walden R. Ursos</td>
+                            <td class="email-column">
+                                <a href="mailto:sums@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    sums@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">School of Agro-Industrial and Technical Education</td>
+                            <td class="head-column">Director Chuchi S. Montenegro</td>
+                            <td class="email-column">
+                                <a href="mailto:saite@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    saite@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">School of Basic Education</td>
+                            <td class="head-column">OIC Director Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:sbe@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    sbe@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Early Childhood</td>
+                            <td class="head-column">OIC Director Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:earlychildhood@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    earlychildhood@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Elementary</td>
+                            <td class="head-column">OIC Director Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:elementary@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    elementary@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Junior High School</td>
+                            <td class="head-column">OIC Director Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:suhs@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    suhs@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Senior High School</td>
+                            <td class="head-column">OIC Director Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:seniorhigh@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    seniorhigh@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">School of Public Affairs and Governance</td>
+                            <td class="head-column">Dean Jojema D. Indab</td>
+                            <td class="email-column">
+                                <a href="mailto:spag@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    spag@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Office of Registrar and Admissions</td>
+                            <td class="head-column">OIC Director Batchiba R. Lacdo-o</td>
+                            <td class="email-column">
+                                <a href="mailto:ora@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    ora@su.edu.ph
+                                </a>
+                                <a href="mailto:admissions@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    admissions@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="department-column">Office of Registrar and Admissions</td>
+                            <td class="head-column">-</td>
+                            <td class="email-column">
+                                <a href="mailto:studentaccounts@su.edu.ph?cc=sgstraw@su.edu.ph">
+                                    studentaccounts@su.edu.ph
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div aria-hidden="true" aria-labelledby="grievance-modal" class="modal fade" id="grievance-modal" role="dialog"
      tabindex="-1">
     <div class="modal-dialog">
@@ -679,8 +925,6 @@ TODO: Add admin CRUD of grievances
                 <div class="modal-title">
                     <h5 data-role="grievance-breadcrumbs">
                         <span class="breadcrumb-item" data-dismiss="modal">Home</span>
-                        <span class="breadcrumb-item" data-role="generated-crumb">Test</span>
-                        <span class="breadcrumb-item" data-role="generated-crumb">Test 2</span>
                     </h5>
                 </div>
                 <button aria-label="Close" class="close" data-dismiss="modal" type="button">
@@ -693,7 +937,7 @@ TODO: Add admin CRUD of grievances
                          class="grievance-image"
                          data-role="grievance-image"
                          id="grievance-image"
-                         src="images/welcome-picture.png"/>
+                         src="images/teacher.png"/>
                     <h2 data-role="grievance-title" id="grievance-title">
                         Grievance Title
                     </h2>
@@ -734,7 +978,7 @@ TODO: Add admin CRUD of grievances
                             </div>
                         </a>
 
-                        <div class="resources-badges">
+                        <div class="resources-badges" data-target="#directory-table-modal" data-toggle="modal">
                             <i class="far fa-list-alt resources-icon"></i>
                             <div class="resources-text">
                                 <h5>Directory List</h5>
@@ -757,6 +1001,9 @@ TODO: Add admin CRUD of grievances
 <script src="js/user-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase.js"></script>
 <script src="js/firebase.js"></script>
+<script charset="utf8"
+        src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"
+        type="text/javascript"></script>
 
 <script>
     $(function () {
@@ -766,6 +1013,31 @@ TODO: Add admin CRUD of grievances
         );
 
         new UserFunctions();
+
+        $(document).ready(function () {
+            $('#directory-table').DataTable({
+                responsive: {
+                    details: false
+                }
+            });
+        });
+
+        $(document).on({
+            'show.bs.modal': function () {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function () {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            },
+            'hidden.bs.modal': function () {
+                if ($('.modal:visible').length > 0) {
+                    setTimeout(function () {
+                        $(document.body).addClass('modal-open');
+                    }, 0);
+                }
+            }
+        }, '.modal');
     });
 </script>
 

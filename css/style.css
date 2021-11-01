@@ -124,7 +124,7 @@ body .btn-secondary:hover {
 }
 
 .welcome-banner .welcome-image-wrapper img {
-    max-height: 500px;
+    max-height: 600px;
     width: auto;
 }
 
@@ -520,11 +520,11 @@ div#grievance-steps-box > ol li::marker {
     box-shadow: var(--site-shadow);
     display: grid;
     flex: 1 1 250px;
-    grid-template-rows: 140px 1fr;
+    grid-template-rows: 100px 1fr;
+    max-width: 350px;
     padding: 2em;
     text-align: center;
     transition: 0.2s;
-    max-width: 350px;
 }
 
 #grievance-modal .resources-icon {
@@ -537,10 +537,15 @@ div#grievance-steps-box > ol li::marker {
 }
 
 #grievance-modal .resources-wrapper > *:hover {
-    text-decoration: none;
     cursor: pointer;
+    text-decoration: none;
     transform: scale(1.05);
     transition: 0.3s;
+}
+
+#grievance-modal .resources-wrapper > *:active {
+    transform: scale(0.95);
+    transition: 0.2s;
 }
 
 #grievance-modal .resources-text * {
@@ -1002,8 +1007,84 @@ div#grievance-children-box:empty {
     text-decoration: underline;
 }
 
+#directory-table-modal .modal-dialog {
+    max-width: 1000px;
+}
+
+#directory-table-modal .modal-header {
+    border-bottom: 0;
+}
+
+#directory-table {
+    border-bottom: 0;
+}
+
+#directory-table th {
+    white-space: nowrap;
+}
+
+#directory-table td, table#directory-table th {
+    border-bottom: 0;
+}
+
+#directory-table th:hover {
+    cursor: pointer;
+}
+
+#directory-table tr {
+    border-bottom: 1px solid gainsboro;
+}
+
+#directory-table-modal .modal-content, #directory-table-modal .modal-content {
+    padding: 1.5rem;
+}
+
+#directory-table-modal td,
+#directory-table-modal th {
+    min-width: 100px;
+    padding: 10px 25px 10px 0;
+    width: 50%;
+}
+
+#directory-table-modal th {
+    white-space: nowrap;
+}
+
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--darkTransparent);
+    border: 1px solid transparent;
+    color: white !important;
+}
+
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button {
+    border: 1px solid transparent;
+    margin-left: 2px;
+    padding: 5px 10px;
+}
+
+#directory-table-modal .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--darkTransparent) !important;
+    cursor: default;
+}
+
+#directory-table-modal #directory-table_wrapper {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 0.5em;
+}
+
+#directory-table-modal #directory-table_wrapper > * {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+}
+
 #grievance-children-box > .grievance-box {
-    background: var(--lightTransparent);
+    background: #9dd4d6;
     border-radius: 1em;
     box-shadow: var(--site-shadow);
     cursor: pointer;
@@ -1027,7 +1108,7 @@ div#grievance-children-box:empty {
 
 #grievance-children-box > .grievance-box .media-wrapper {
     display: block;
-    height: 140px;
+    height: 100px;
     margin: auto;
     min-height: 20px;
     width: auto;
@@ -1048,6 +1129,18 @@ div#grievance-children-box:empty {
 
     #grievance-modal .modal-header .breadcrumb-item {
         font-size: 1rem;
+    }
+
+    div#directory-table-modal .modal-content, #directory-table-modal .modal-content {
+        padding: 0;
+    }
+
+    #directory-table-modal td, #directory-table-modal th {
+        font-size: 0.7rem;
+        min-width: unset;
+        padding: 2px 15px 2px 0;
+        width: auto;
+        word-break: break-all;
     }
 }
 
@@ -1131,4 +1224,106 @@ div#grievance-children-box:empty {
     top: 0;
     width: 100vw;
     z-index: 99999;
+}
+
+/* Admin */
+.admin-page {
+    background: transparent;
+}
+
+.admin-page .admin-section {
+    background: white;
+    border-radius: 8px;
+    margin: 1.5em;
+    padding: 1.5em;
+}
+
+.admin-page .grievance-list {
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.admin-page .grievance-list > * {
+    flex: 1 1 350px;
+    max-width: 350px;
+}
+
+.admin-page .grievance-list .grievance-item {
+    background: white;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name {
+    align-items: center;
+    border-radius: 4px;
+    column-gap: 1em;
+    display: flex;
+    max-width: 100%;
+    padding: 0.5em;
+    row-gap: 1em;
+    width: fit-content;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name:hover {
+    background-color: #e3e3e3;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.admin-page .grievance-list .grievance-item .children-list .grievance-item {
+    padding: 0 1em;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name .actions button {
+    border: 0;
+    border-radius: 4px;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name .actions button > * {
+    color: white;
+    font-size: 0.8em;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name .actions {
+    align-items: center;
+    column-gap: 10px;
+    display: flex;
+    row-gap: 10px;
+    visibility: hidden;
+}
+
+.admin-page .grievance-list .grievance-item > .grievance-item-name:hover .actions {
+    visibility: visible;
+}
+
+.admin-page .grievance-list .grievance-item .children-list {
+    overflow: hidden;
+    position: relative;
+}
+
+.admin-page .grievance-list .grievance-item .children-list:not(:empty):after {
+    background: #e3e3e3;
+    content: '';
+    height: 100%;
+    left: 11px;
+    position: absolute;
+    top: 0;
+    width: 2px;
+}
+
+.admin-page .grievance-list .grievance-item .children-list .grievance-item-name:after {
+    background: #e3e3e3;
+    content: '';
+    height: 2px;
+    left: 11px;
+    position: absolute;
+    width: 6px;
+}
+
+#edit-grievance-form .submit-button,
+#add-grievance-form .submit-button {
+    display: block;
+    margin: auto 0 auto auto;
 }
