@@ -1279,6 +1279,8 @@ div#grievance-children-box:empty {
 .admin-page .grievance-list .grievance-item > .grievance-item-name .actions button {
     border: 0;
     border-radius: 4px;
+    height: 25px;
+    width: 25px;
 }
 
 .admin-page .grievance-list .grievance-item > .grievance-item-name .actions button > * {

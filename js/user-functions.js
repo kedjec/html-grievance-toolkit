@@ -1124,6 +1124,7 @@ const adminOptions = {
     grievanceItemChildrenListClassName: 'children-list',
     grievancesActionClassName: 'actions',
     grievancesActionEditClassName: 'edit-button',
+    grievancesActionDeleteClassName: 'delete-button',
     grievancesActionAddChildClassName: 'add-child-button',
     dataAncestorAttributeName: 'data-ancestor',
     editGrievanceModal: '#edit-grievance-modal',
@@ -1194,6 +1195,7 @@ class AdminFunctions {
         let grievanceName = document.createElement('span');
         let editButton = document.createElement("button");
         let addChildButton = document.createElement("button");
+        let deleteChildButton = document.createElement("button");
         let actions = document.createElement('div');
 
         actions.classList.add(adminOptions.grievancesActionClassName);
@@ -1204,6 +1206,7 @@ class AdminFunctions {
             grievanceItem.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
             editButton.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
             addChildButton.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
+            deleteChildButton.setAttribute(adminOptions.dataAncestorAttributeName, ancestor);
         }
 
         addChildButton.innerHTML = "<i class=\"fas fa-plus\"></i>";
@@ -1221,6 +1224,14 @@ class AdminFunctions {
             AdminFunctions.openEditGrievanceModal(this);
         });
         actions.append(editButton);
+
+        deleteChildButton.innerHTML = "<i class=\"fas fa-times\"></i>";
+        deleteChildButton.classList.add('bg-danger');
+        deleteChildButton.classList.add(adminOptions.grievancesActionDeleteClassName);
+        deleteChildButton.addEventListener('click', function () {
+            AdminFunctions.deleteGrievance(this);
+        });
+        actions.append(deleteChildButton);
 
         grievanceName.innerHTML = name;
         grievanceItemName.append(grievanceName);
@@ -1254,6 +1265,36 @@ class AdminFunctions {
     static redirectToHome() {
         alert("Invalid User");
         window.location.replace(`${adminOptions.homepageLink}`);
+    }
+
+    static deleteGrievance(element) {
+        let dataAncestor = element.getAttribute(adminOptions.dataAncestorAttributeName).split(",");
+        let databaseQuery = `${firebaseConfig.db_grievances}`;
+        let iterator = 1;
+        let specificSnapshot = AdminFunctions.grievancesSnapshot;
+
+        dataAncestor.forEach(function (value) {
+            if ((dataAncestor.length > 1) && (iterator !== dataAncestor.length)) {
+                databaseQuery += `/${value}/children`;
+                specificSnapshot = specificSnapshot[value].children;
+            } else {
+                databaseQuery += `/${value}`;
+                specificSnapshot = specificSnapshot[value];
+            }
+            iterator++;
+        });
+
+        let continueDelete = confirm(`Are you sure you want to delete ${specificSnapshot.name}?`);
+
+        if (!continueDelete) return;
+
+        database.ref(`${databaseQuery}`).remove(function (error) {
+            if (error) {
+                alert('Deleting Grievance Failed');
+            } else {
+                window.location.reload();
+            }
+        });
     }
 
     static openEditGrievanceModal(element) {
