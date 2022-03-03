@@ -750,8 +750,7 @@ class UserFunctions {
                 UserFunctions.displayAlert(UserFunctions.loginForm, cssClassOptions.alertSuccess, loginOptions.adminSuccessfulLogInMessage);
 
                 UserFunctions.sleep(1000).then(() => {
-                    // TODO: Change This
-                    window.location.replace(`/html-grievance-toolkit/admin-dashboard.html`);
+                    window.location.replace(`/admin-dashboard.html`);
                 });
             } else {
                 let loggedInUser = firebase.auth().currentUser;
@@ -1118,7 +1117,7 @@ class UserFunctions {
 
 const adminOptions = {
     listOfGrievancesDataRole: '[data-role="list-of-grievances"]',
-    homepageLink: 'http://localhost:63342/html-grievance-toolkit/',
+    homepageLink: `${window.location.origin}`,
     grievanceItemClassName: 'grievance-item',
     grievanceItemNameClassName: 'grievance-item-name',
     grievanceItemChildrenListClassName: 'children-list',
